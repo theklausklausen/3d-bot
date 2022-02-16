@@ -1,41 +1,22 @@
-# image: python:latest
-# variables:
-#   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-# cache:
-#   paths:
-#     - .cache/pip
-#     - venv/
+image: registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper
 
 # before_script:
-#   - python --version  # For debugging
-#   - pip install virtualenv
-#   - virtualenv venv
-#   - source venv/bin/activate
+#   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
-build:
+stages:
+  - build
+  # - deploy
+
+build-prod:
+  stage: build
   script:
     - docker build --tag 3d-bot .
-#     - pip install tox flake8  # you can also use tox
-#     - tox -e py36,flake8
+  only:
+    - master
 
-# run:
+# deploy-prod:
+#   stage: deploy
 #   script:
-#     - python setup.py bdist_wheel
-#     # an alternative approach is to install and run:
-#     - pip install dist/*
-#     # run the command here
-#   artifacts:
-#     paths:
-#       - dist/*.whl
-
-# pages:
-#   script:
-#     - pip install sphinx sphinx-rtd-theme
-#     - cd doc ; make html
-#     - mv build/html/ ../public/
-#   artifacts:
-#     paths:
-#       - public
-#   rules:
-#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#     - docker stack deploy -c docker-compose.yml --with-registry-auth my-stack
+#   only:
+#     - master
