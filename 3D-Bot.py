@@ -4,6 +4,11 @@ from PIL import Image
 import requests
 from io import BytesIO
 import datetime
+from paho.mqtt import client as mqtt_client
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 octopi_job_url = os.environ.get('OCTOPI_URL', 'http://octoprint.local') + '/api/job'
 octopi_printhead_url = os.environ.get('OCTOPI_URL', 'http://octoprint.local') + '/api/printer/printhead'
@@ -14,11 +19,18 @@ bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '1234567890')
 chat_id = os.environ.get('TELEGRAM_CHAT_ID', '1234567890')
 telegram_text_url = 'https://api.telegram.org/bot' + bot_token + '/sendMessage?chat_id=' + chat_id + '&text='
 telegram_image_url = 'https://api.telegram.org/bot' + bot_token + '/sendPhoto?' + 'caption='
+mqtt_host = os.environ.get('MQTT_HOST', '127.0.0.1')
+mqtt_port = os.environ.get('MQTT_PORT', 1883)
+mqtt_user = os.environ.get('MQTT_USER', 'user')
+mqtt_password = os.environ.get('MQTT_PASSWORD', 'password')
+lamp_topic = os.environ.get('MQTT_LAMP_TOPIC', '/lamp/topic')
 lamp_topic = os.environ.get('MQTT_LAMP_TOPIC', '/lamp/topic')
 lamp_on_command = topic = os.environ.get('MQTT_LAMP_ON', 'on')
 lamp_off_command = os.environ.get('MQTT_LAMP_OFF', 'off')
-printer_topic = os.environ.get('MQTT_PRINTER_TOPIC', '/lamp/topic')
+printer_topic = os.environ.get('MQTT_PRINTER_TOPIC', '/printer/topic')
 printer_off_command = os.environ.get('MQTT_PRINTER_OFF', 'off')
+octo_topic = os.environ.get('MQTT_OCTO_TOPIC', '/octo/topic')
+octo_off_command = os.environ.get('MQTT_OCTO_OFF', 'off')
 
 state = {
     25: True,
@@ -26,6 +38,26 @@ state = {
     75: True,
     100: True
 }
+
+def connect_mqtt():
+    def on_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print("Connected to MQTT Broker!")
+        else:
+            print("Failed to connect, return code %d\n", rc)
+    client = mqtt_client.Client('3d-bot')
+    client.username_pw_set(mqtt_user, mqtt_password)
+    client.on_connect = on_connect
+    client.connect(mqtt_host, int(mqtt_port))
+    return client
+
+def publish(topic, message, client):
+    result = client.publish(topic, message)
+    status = result[0]
+    if status == 0:
+        print(f"MQTT :: Send `{message}` to topic `{topic}`")
+    else:
+        print(f"MQTT :: Failed to send message to topic {topic}")
 
 def resetState():
     setState(25, True)
@@ -36,7 +68,7 @@ def resetState():
 def handleConnectionError(message, sendMessageActivated = True):
     print('failed: ' + message)
     if sendMessageActivated:
-        sendMessage('failed: ' + message)
+        sendMessage('MQTT :: failed: ' + message)
 
 def sendMessage(message):
     url = telegram_text_url + message
@@ -49,10 +81,10 @@ def sendMessage(message):
     except requests.ConnectionError:
         handleConnectionError(url, False)
 
-def sendImage(name, percentage, print_time_left = ''):
+def sendImage(name, percentage, client, print_time_left = ''):
     caption = 'Print ' + name + ' is ' + str(round(percentage, 2)) + '% done!'
     url = telegram_image_url + caption + ' ' + print_time_left
-    photo = {'photo': getImage(name)}
+    photo = {'photo': getImage(name, client)}
     data = {'chat_id' : chat_id}
     try:
         response = requests.post(url, files=photo, data=data)
@@ -64,8 +96,8 @@ def sendImage(name, percentage, print_time_left = ''):
     except requests.ConnectionError:
         handleConnectionError(url)
 
-def getImage(name):
-    switchLight(lamp_topic, lamp_on_command)
+def getImage(name, client):
+    switchRelay(lamp_topic, lamp_on_command, client)
     try:
         response = requests.get(octopi_image_url)
         if response.status_code == 200:
@@ -77,29 +109,19 @@ def getImage(name):
         handleConnectionError(octopi_image_url)
     photo = BytesIO(response.content)
     photo.name = name + '.png'
-    switchLight(lamp_topic, lamp_off_command)
+    time.sleep(10.0)
+    switchRelay(lamp_topic, lamp_off_command, client)
     return photo
 
-def switchLight(topic, state):
+def switchRelay(topic, state, client):
     print('mqtt ' + topic + '/' + state)
-    if state == lamp_on_command:
-        time.sleep(10.0)
+    publish(topic, state, client)
+    time.sleep(3.0)
 
 def setState(stateNumber, stateValue):
     state[stateNumber] = stateValue
 
-def devidePercentage(name, percentage, print_time_left):
-    if percentage <= 10:
-        resetState()
-    if percentage >= 25 and percentage < 50 and state[25]:
-        sendImage(name, percentage, print_time_left)
-        setState(25, False)
-    if percentage >= 50 and percentage < 75 and state[50]:
-        sendImage(name, percentage, print_time_left)
-        setState(50, False)
-    if percentage >= 75 and percentage < 100 and state[75]:
-        sendImage(name, percentage, print_time_left)
-        setState(75, False)
+def devidePercentage(name, percentage, print_time_left, client):
     if percentage >= 100 and state[100]:
         try:
             response = requests.post(octopi_printhead_url, headers=token, data={'absolute':False,'y':-150,'command':'jog'})
@@ -110,8 +132,7 @@ def devidePercentage(name, percentage, print_time_left):
         except requests.ConnectionError:
             handleConnectionError(octopi_printhead_url)
         time.sleep(5.0)
-        sendMessage('Attention: Sending Image went wrong')
-        sendImage(name, percentage)
+        sendImage(name, percentage, client)
         setState(100, False)
         time.sleep(30.0)
         try:
@@ -122,11 +143,30 @@ def devidePercentage(name, percentage, print_time_left):
                 print(response.status_code, response.reason, response.content)
         except requests.ConnectionError:
             handleConnectionError(octopi_shutdown_url)
-        switchLight(printer_topic, printer_off_command)
+        switchRelay(printer_topic, printer_off_command, client)
+        time.sleep(60.0)
+        switchRelay(octo_topic, octo_off_command, client)
+    if percentage <= 10:
+        resetState()
+    if percentage >= 25 and percentage < 50 and state[25]:
+        setState(25, False)
+        sendImage(name, percentage, client, print_time_left)    
+    if percentage >= 50 and percentage < 75 and state[50]:
+        setState(50, False)
+        sendImage(name, percentage, client, print_time_left)    
+    if percentage >= 75 and percentage < 100 and state[75]:
+        setState(75, False)
+        sendImage(name, percentage, client, print_time_left)    
+
+def mqtt_reconnect():
+    client = connect_mqtt()
+    client.loop_start()
+    return client
 
 def main():
     resetState()
     sendMessage('Starting Bot 3DB')
+    client = mqtt_reconnect()
     while True:
         response = None
         try:
@@ -147,7 +187,7 @@ def main():
             print_time_left = str(hour) + ' Hours ' + str(minutes) + ' Minutes remaining'
             name = response.json()['job']['file']['name'] 
             completion = response.json()['progress']['completion'] or 0
-            devidePercentage(name, completion, print_time_left)
+            devidePercentage(name, completion, print_time_left, client)
             print(name + ' : ' + str(round(completion, 2)) + '%')
         time.sleep(5.0)
 

@@ -7,7 +7,7 @@ stages:
   - build
   # - deploy
 
-build-prod:
+build:
   stage: build
   script:
     - docker build --tag 3d-bot .
