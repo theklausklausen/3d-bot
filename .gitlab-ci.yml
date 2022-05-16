@@ -18,7 +18,7 @@ build:
   stage: build
   image: docker:latest
   script:
-    - docker build --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
+    - docker buildx build --platform linux/arm/v7,linux/arm64/v8,linux/amd64 --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
 
 push:
   stage: push
