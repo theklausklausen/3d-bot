@@ -10,6 +10,10 @@ services:
   - name: docker:dind
     command: ["--registry-mirror", "https://mirror.kk.int"]
 
+stages:
+  - build
+  - push
+
 build:
   stage: build
   image: docker:latest
