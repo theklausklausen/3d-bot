@@ -10,11 +10,18 @@ services:
   - name: docker:dind
     command: ["--registry-mirror", "https://mirror.kk.int"]
 
-docker_build:
+build:
   stage: build
   image: docker:latest
   script:
-    - docker build --tag repo.kk.int/3d-bot .
+    - docker build --tag ${NEXUS_REPO_HOST}/3d-bot .
+
+push:
+  stage: push
+  script:
+    - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
+    - docker push ${NEXUS_REPO_HOST}/3d-bot
+    - docker logout ${NEXUS_REPO_HOST}/3d-bot
 
 # deploy-prod:
 #   stage: deploy
