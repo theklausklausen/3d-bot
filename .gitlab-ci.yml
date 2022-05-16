@@ -8,7 +8,7 @@ variables:
 
 services:
   - name: docker:dind
-    command: ["--registry-mirror", "https://mirror.kk.int"]
+    command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 stages:
   - build
