@@ -1,8 +1,14 @@
 # before_script:
 #   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
+image: docker:dind
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+
 services:
-  - docker:dind
+  - name: docker:dind
+    command: ["--registry-mirror", "https://mirror.kk.int"]
 
 docker_build:
   stage: build
