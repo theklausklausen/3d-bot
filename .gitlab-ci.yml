@@ -1,18 +1,14 @@
-image: registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper
-
 # before_script:
 #   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
-stages:
-  - build
-  # - deploy
+services:
+  - docker:dind
 
-build:
+docker_build:
   stage: build
+  image: docker:latest
   script:
     - docker build --tag repo.kk.int/3d-bot .
-  only:
-    - master
 
 # deploy-prod:
 #   stage: deploy
