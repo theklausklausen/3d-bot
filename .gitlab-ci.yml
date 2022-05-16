@@ -18,7 +18,7 @@ build:
   stage: build
   image: docker:latest
   script:
-    - docker build --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} . --registry-mirror https://${NEXUS_MIRROR_HOST}
+    - docker build --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} . --registry-mirror=https://${NEXUS_MIRROR_HOST}
 
 push:
   stage: push
