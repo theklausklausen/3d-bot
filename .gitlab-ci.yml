@@ -10,7 +10,7 @@ stages:
 build:
   stage: build
   script:
-    - docker build --tag 3d-bot .
+    - docker build --tag repo.kk.int/3d-bot .
   only:
     - master
 
