@@ -14,7 +14,9 @@ build:
   stage: build
   image: jdrouet/docker-with-buildx:stable
   script:
-    - docker buildx build --platform linux/arm/v7,linux/arm64/v8,linux/amd64 --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
+    - docker context create builder-context
+    - docker buildx create --name builderx --driver docker-container --use builder-context
+    - docker buildx build -f Dockerfile --push --platform linux/arm/v7,linux/arm64/v8,linux/amd64 --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
 
 push:
   stage: push
