@@ -16,7 +16,7 @@ build:
   script:
     - docker buildx create --name ci-builder --driver docker-container --platform ${PROJECT_PLATTFORMS}
     - docker buildx use ci-builder
-    - docker buildx build -f ${CI_PROJECT_DIR}/Dockerfile --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
+    - docker buildx build -f ${CI_PROJECT_DIR}/Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
 
 push:
   stage: push
