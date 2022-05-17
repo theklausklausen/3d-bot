@@ -2,6 +2,13 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
 
+before_script:
+  - apk update >/dev/null
+  - apk add ca-certificates > /dev/null
+  - rm -rf /var/cache/apk/*
+  - cp /etc/gitlab-runner/certs/ca.crt /usr/local/share/ca-certificates/ca.crt
+  - update-ca-certificates
+
 services:
   - name: docker:dind
     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
