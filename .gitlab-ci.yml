@@ -25,7 +25,6 @@ push:
     - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
     - docker buildx create --use
     - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
-    # - docker buildx build --push --platform ${PROJECT_PLATTFORMS} ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
     - docker logout ${NEXUS_REPO_HOST}
 
 # deploy-prod:
