@@ -2,7 +2,7 @@ image: docker:stable
 
 services:
   - name: docker:stable
-    command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
+    # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 variables:
   DOCKER_DRIVER: overlay2
