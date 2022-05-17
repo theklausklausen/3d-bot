@@ -28,7 +28,7 @@ build:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - docker buildx create 
       --driver docker-container
-      --config buildkit.toml
+      --config /buildkit.toml
       --use
     - docker buildx build 
         -f ${CI_PROJECT_DIR}/Dockerfile 
