@@ -1,7 +1,7 @@
-image: jdrouet/docker-with-buildx:stable
+image: docker:stable
 
 services:
-  - name: jdrouet/docker-with-buildx:stable
+  - name: docker:stable
     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 variables:
@@ -13,6 +13,8 @@ variables:
 #     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 before_script:
+  - wget -O /usr/bin/docker-buildx https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.${BUILDX_ARCH}
+  - chmod +x /usr/bin/docker-buildx
   - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
 after_script:
   - docker logout ${NEXUS_REPO_HOST}
@@ -23,7 +25,7 @@ stages:
 
 build:
   stage: build
-  image: jdrouet/docker-with-buildx:stable
+  image: docker:stable
   script:
     - docker context create ci-context
     - docker buildx create --name ci-builder --driver docker-container --use ci-context
