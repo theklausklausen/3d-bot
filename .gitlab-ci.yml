@@ -1,7 +1,7 @@
-image: jdrouet/docker-with-buildx:latest
+image: docker:latest
 
 services:
-  - name: jdrouet/docker-with-buildx:latest
+  - name: docker:latest
     # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 variables:
@@ -23,11 +23,18 @@ stages:
 
 build:
   stage: build
-  image: jdrouet/docker-with-buildx:latest
+  image: docker:latest
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - docker buildx create --driver docker-container --use
-    - docker buildx build -f ${CI_PROJECT_DIR}/Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} . --no-cache
+    - docker buildx build 
+        -f ${CI_PROJECT_DIR}/Dockerfile 
+        --platform ${PROJECT_PLATTFORMS} 
+        --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} . 
+        --no-cache
+        --build-arg BUILDKIT_MULTI_PLATFORM=1 
+        --push
+        --buildkitd-flags '--allow-insecure-entitlement security.insecure'
 
 # push:
 #   stage: push
