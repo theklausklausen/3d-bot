@@ -25,10 +25,9 @@ build:
   stage: build
   image: docker:latest
   script:
-    # - docker buildx help
     - docker buildx create --use
-    # - docker buildx use ci-builder
-    - docker buildx build --push -f ${CI_PROJECT_DIR}/Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
+    - docker buildx build -f ${CI_PROJECT_DIR}/Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
+    - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
 
 # push:
 #   stage: push
