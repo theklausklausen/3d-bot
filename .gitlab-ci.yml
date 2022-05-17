@@ -19,8 +19,8 @@ stages:
 build:
   stage: build
   image: jdrouet/docker-with-buildx:stable
-      # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
   script:
+    - echo ${PROJECT_PLATTFORMS}
     - docker buildx create --name ci-builder --driver docker-container --platform ${PROJECT_PLATTFORMS}
     - docker buildx use ci-builder
     - docker buildx build -f ${CI_PROJECT_DIR}/Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
@@ -28,7 +28,6 @@ build:
 push:
   stage: push
   image: jdrouet/docker-with-buildx:stable
-      # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
   script: 
     - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
 
