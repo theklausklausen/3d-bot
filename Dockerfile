@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM python:3.7-alpine
+FROM --platform=$BUILDPLATFORM python:alpine
 RUN mkdir /app
 WORKDIR /app
 COPY 3D-Bot.py .
