@@ -1,7 +1,7 @@
-image: docker:latest
+image: jdrouet/docker-with-buildx:latest
 
 services:
-  - name: docker:latest
+  - name: jdrouet/docker-with-buildx:latest
     # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 variables:
@@ -23,7 +23,7 @@ stages:
 
 build:
   stage: build
-  image: docker:latest
+  image: jdrouet/docker-with-buildx:latest
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - docker buildx create --driver docker-container --use
