@@ -13,8 +13,6 @@ variables:
 #     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 before_script:
-  - wget -O /usr/bin/docker-buildx https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.${BUILDX_ARCH}
-  - chmod +x /usr/bin/docker-buildx
   - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
 after_script:
   - docker logout ${NEXUS_REPO_HOST}
