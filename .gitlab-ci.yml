@@ -26,8 +26,8 @@ build:
   image: docker:stable
   script:
     - docker context create ci-context
-    - docker buildx create --name ci-builder --driver docker-container --use ci-context
-    - docker buildx use ci-builder
+    - docker buildx create --driver docker-container --use ci-context
+    - docker buildx use
     - docker buildx build --push -f ${CI_PROJECT_DIR}/Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
 
 # push:
