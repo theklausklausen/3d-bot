@@ -7,7 +7,7 @@ variables:
 #     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 befor_script:
-  - "printf '{\n  \"registry-mirrors\": [\"https://mirror.kk.int\"]\n}\n' > /etc/dockar/daemon.json"
+  # - "printf '{\n  \"registry-mirrors\": [\"https://mirror.kk.int\"]\n}\n' > /etc/dockar/daemon.json"
   - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
 
 after_script:
@@ -19,7 +19,9 @@ stages:
 
 build:
   stage: build
-  image: jdrouet/docker-with-buildx:stable
+  image: 
+    - name: jdrouet/docker-with-buildx:stable
+      command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
   script:
     - docker buildx create --name ci-builder --driver docker-container --platform ${PROJECT_PLATTFORMS}
     - docker buildx use ci-builder
@@ -27,7 +29,9 @@ build:
 
 push:
   stage: push
-  image: jdrouet/docker-with-buildx:stable
+  image: 
+    - name: jdrouet/docker-with-buildx:stable
+      command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
   script: 
     - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
 
