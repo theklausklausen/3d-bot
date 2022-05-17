@@ -26,7 +26,7 @@ build:
   image: docker:latest
   script:
     # - docker buildx help
-    # - docker buildx create ci-builder
+    - docker buildx create --use
     # - docker buildx use ci-builder
     - docker buildx build --push -f ${CI_PROJECT_DIR}/Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
 
