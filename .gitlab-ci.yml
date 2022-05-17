@@ -7,7 +7,6 @@ variables:
 #     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 before_script:
-  - "printf '{\n  \"registry-mirrors\": [\"https://mirror.kk.int\"]\n}\n' > /etc/dockar/daemon.json"
   - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
 after_script:
   - docker logout ${NEXUS_REPO_HOST}
