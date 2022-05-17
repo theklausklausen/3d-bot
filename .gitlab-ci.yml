@@ -22,6 +22,7 @@ push:
   stage: push
   image: jdrouet/docker-with-buildx:stable
   script:
+    - ls -lah /etc/gitlab-runner/certs
     - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
     - docker buildx create --use
     - docker buildx build --push --platform ${PROJECT_PLATTFORMS} ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
