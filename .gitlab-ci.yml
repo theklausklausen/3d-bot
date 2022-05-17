@@ -16,7 +16,7 @@ build:
   script:
     - docker context create builder-context
     - docker buildx create --name builderx --driver docker-container --use builder-context
-    - docker buildx build -f Dockerfile --push --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
+    - docker buildx build -f Dockerfile --platform ${PROJECT_PLATTFORMS} --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} .
 
 push:
   stage: push
