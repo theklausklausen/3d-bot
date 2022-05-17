@@ -5,8 +5,9 @@ services:
     # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 variables:
+  DOCKER_HOST: tcp://dind:2375/
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/etc/gitlab-runner/certs"
+  DOCKER_TLS_CERTDIR: ""
 
 # services:
 #   - name: docker:dind
