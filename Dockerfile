@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM --platform=$BUILDPLATFORM python:alpine
 RUN mkdir /app
 WORKDIR /app
