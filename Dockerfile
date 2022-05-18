@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM --platform=$BUILDPLATFORM python:alpine
+FROM python:alpine
 RUN mkdir /app
 WORKDIR /app
 COPY 3D-Bot.py requirements.txt /app/
