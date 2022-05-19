@@ -22,7 +22,7 @@ build:
       --driver docker-container
       --config /etc/buildkit/buildkit.toml
       --use
-    - cat /etc/buildkit/buildkitd.toml
+    - cat /etc/buildkit/buildkit.toml
     - docker buildx build 
         -f ${CI_PROJECT_DIR}/Dockerfile 
         --platform ${PROJECT_PLATTFORMS} 
