@@ -29,7 +29,7 @@ build:
     - docker buildx create 
       --name ci-builder
       --driver docker-container
-      --config /etc/buildkit.toml
+      --config /etc/buildkit/buildkit.toml
       --use
     - docker buildx build 
         -f ${CI_PROJECT_DIR}/Dockerfile 
