@@ -1,4 +1,4 @@
-# image: jonoh/docker-buildx-qemu
+image: repo.kk.int/runner-dind:latest
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -17,6 +17,7 @@ build:
   stage: build
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
+    - docker run -it --rm --privileged tonistiigi/binfmt --install all
     - ls -lah /etc/docker/daemon.json
     - docker buildx create 
       --name ci-builder
