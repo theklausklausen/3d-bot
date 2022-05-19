@@ -1,7 +1,7 @@
-image: docker:dind
+image: docker:latest
 
 services:
-  - name: docker:dind
+  - name: docker:latest
     # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 variables:
@@ -9,7 +9,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 # services:
-#   - name: docker:dind
+#   - name: docker:latest
 #     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
 
 before_script:
@@ -23,7 +23,7 @@ stages:
 
 build:
   stage: build
-  image: docker:dind
+  image: docker:latest
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - ls -lah /etc/docker/daemon.json
@@ -41,7 +41,7 @@ build:
 
 push:
   stage: push
-  image: docker:dind
+  image: docker:latest
   script:
     - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
 
