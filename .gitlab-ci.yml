@@ -1,16 +1,8 @@
-image: repo.kk.int/runner-dind:latest
-
-services:
-  - name: docker:latest
-    # command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
+image: jonoh/docker-buildx-qemu
 
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-
-# services:
-#   - name: docker:latest
-#     command: ["--registry-mirror", "https://${NEXUS_MIRROR_HOST}"]
+  # DOCKER_TLS_CERTDIR: ""
 
 before_script:
   - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
