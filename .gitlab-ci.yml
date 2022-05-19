@@ -1,4 +1,4 @@
-image: docker:latest
+image: moby/buildkit:latest
 
 services:
   - name: docker:latest
@@ -23,7 +23,7 @@ stages:
 
 build:
   stage: build
-  image: docker:latest
+  image: moby/buildkit:latest
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - ls -lah /etc/docker/daemon.json
@@ -41,7 +41,7 @@ build:
 
 push:
   stage: push
-  image: docker:latest
+  image: moby/buildkit:latest
   script:
     - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
 
