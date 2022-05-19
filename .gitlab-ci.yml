@@ -26,6 +26,7 @@ build:
   image: docker:latest
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
+    - ls -lah /etc/buildkit/buildkit.toml
     - docker buildx create 
       --name ci-builder
       --driver docker-container
