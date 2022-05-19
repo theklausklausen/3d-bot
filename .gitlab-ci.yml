@@ -1,4 +1,4 @@
-image: moby/buildkit:latest
+image: repo.kk.int/runner-dind:latest
 
 services:
   - name: docker:latest
@@ -23,7 +23,6 @@ stages:
 
 build:
   stage: build
-  image: moby/buildkit:latest
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - ls -lah /etc/docker/daemon.json
@@ -39,11 +38,11 @@ build:
         --no-cache
         --push
 
-push:
-  stage: push
-  image: moby/buildkit:latest
-  script:
-    - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
+# push:
+#   stage: push
+#   image: moby/buildkit:latest
+#   script:
+#     - docker push ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
 
 
 # deploy-prod:
