@@ -20,7 +20,7 @@ build:
     - docker buildx create 
       --name ci-builder
       --driver docker-container
-      --config /etc/buildkit/buildkit.toml
+      --config /etc/buildkit.toml
       --use
     - docker buildx inspect --bootstrap
     - docker buildx build 
