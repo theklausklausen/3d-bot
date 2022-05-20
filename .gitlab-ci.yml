@@ -17,7 +17,6 @@ build:
   stage: build
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
-    - cat /etc/buildkit/buildkit.toml
     - docker buildx create 
       --name ci-builder
       --driver docker-container
@@ -25,11 +24,10 @@ build:
       --use
     - docker buildx inspect --bootstrap
     - docker buildx build 
+        --push
         -f ${CI_PROJECT_DIR}/Dockerfile 
         --platform ${PROJECT_PLATTFORMS} 
         --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} . 
-        --no-cache
-        --push
 
 # push:
 #   stage: push
