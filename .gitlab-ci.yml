@@ -22,13 +22,12 @@ build:
       --driver docker-container
       --config /etc/buildkit/buildkit.toml
       --use
-    - cat /etc/buildkit/buildkit.toml
     - docker buildx build 
         -f ${CI_PROJECT_DIR}/Dockerfile 
         --platform ${PROJECT_PLATTFORMS} 
         --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} . 
         --no-cache
-        --output=type=registry,registry.insecure=true
+        --push
 
 # push:
 #   stage: push
