@@ -29,6 +29,7 @@ build:
         --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME} . 
         --no-cache
         --push
+        --registry.insecure=true
 
 # push:
 #   stage: push
