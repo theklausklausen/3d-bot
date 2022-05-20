@@ -22,6 +22,7 @@ build:
       --driver docker-container
       --config /etc/buildkit/buildkit.toml
       --use
+    - docker buildx inspect --bootstrap
     - docker buildx build 
         -f ${CI_PROJECT_DIR}/Dockerfile 
         --platform ${PROJECT_PLATTFORMS} 
