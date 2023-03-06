@@ -1,7 +1,13 @@
 # syntax=docker/dockerfile:1
-FROM python:alpine
-RUN mkdir /app
+FROM python:3
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ARG USER=bot
 WORKDIR /app
-COPY 3D-Bot.py requirements.txt /app/
-RUN pip3 install -r requirements.txt
-CMD [ "python3", "3D-Bot.py"]
+COPY . /app/
+RUN useradd $USER && \
+    chown $USER:$USER /app && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
+USER $USER
+ENTRYPOINT [ "python3", "3d-bot.py"]
