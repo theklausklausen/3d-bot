@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 import os
 import requests
 
@@ -18,7 +17,7 @@ class OctoPi():
         self.token = {
             "x-api-key": os.environ.get('OCTOPI_TOKEN', 'abcdefghijklmnopqrstuvwxyz')}
 
-    def get_status(self) -> Job:
+    def get_status(self) -> Job | None:
         response = None
         self.logger.info_message('requesting job state')
         try:
