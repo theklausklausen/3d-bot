@@ -15,12 +15,12 @@ build_production:
   before_script:
     - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
   after_script:
-    - docker buildx rm builder-${CI_PROJECT_NAME}
+    - docker buildx rm ${CI_PROJECT_NAME}-builder
     - docker logout ${NEXUS_REPO_HOST}
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - docker buildx create 
-      --name builder-${CI_PROJECT_NAME}
+      --name ${CI_PROJECT_NAME}-builder
       --driver docker-container
       --config /etc/buildkit.toml 
       --use
@@ -33,26 +33,27 @@ build_production:
       --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
       --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}:latest . 
 
-#deploy:
-#  stage: deploy
-#  only:
-#    - main
-#  image: alpine
-#  before_script:
-#    - apk add openssh
-#    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' 
-#    - eval $(ssh-agent -s)
-#    - echo "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add -
-#    - mkdir -p ~/.ssh
-#    - chmod 700 ~/.ssh
-#    - ssh-keyscan ${SWARM_MANAGER} >> ~/.ssh/known_hosts
-#    - chmod 644 ~/.ssh/known_hosts
-#  script:
-#    - ssh
-#      ${SWARM_MANAGER_USER}@${SWARM_MANAGER} 
-#      "cd /mnt/clusterfs && 
-#      docker service update 
-#      --force 
-#      --update-failure-action rollback 
-#      --image ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}:latest
-#      botfarm_${CI_PROJECT_NAME}"
+deploy:
+  stage: deploy
+  only:
+    - main
+  image: alpine
+  before_script:
+    - apk add openssh
+    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' 
+    - eval $(ssh-agent -s)
+    - echo "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan ${SWARM_MANAGER} >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - ssh
+      ${SWARM_MANAGER_USER}@${SWARM_MANAGER} 
+      "cd /mnt/clusterfs && 
+      docker service update 
+      --force 
+      --update-failure-action rollback 
+      --image ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}:latest
+      botfarm_${CI_PROJECT_NAME}"
+
