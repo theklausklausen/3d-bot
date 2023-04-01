@@ -20,7 +20,7 @@ build_production:
   script:
     - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
     - docker buildx create 
-      --name ${CI_PROJECT_NAME}-builder
+      --name builder-${CI_PROJECT_NAME}
       --driver docker-container
       --config /etc/buildkit.toml 
       --use
