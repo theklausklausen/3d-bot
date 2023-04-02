@@ -9,7 +9,7 @@ class OctoPi():
     def __init__(self, debug: bool = False):
         self.debug = debug
         self.logger = Logger(debug=debug)
-        self.host = os.environ.get('OCTOPI_HOST', 'http://octoprint.local')
+        self.host = os.environ.get('OCTOPI_URL', 'http://octoprint.local')
         self.job_url = self.host + '/api/job'
         self.printhead_url = self.host + '/api/printer/printhead'
         self.shutdown_url = self.host + '/api/system/commands/core/shutdown'
