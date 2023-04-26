@@ -1,0 +1,21 @@
+[
+  {
+    "_id": "632c9913-de7e-4e6b-82da-718258ef7403",
+    "name": "workspace.env",
+    "default": true,
+    "sortNum": 10000,
+    "created": "2023-04-26T17:46:01.493Z",
+    "modified": "2023-04-26T17:46:01.493Z",
+    "data": [
+      {
+        "name": "OCTOPI_KEY",
+        "value": "69FF5613BEE04D3980B7598C0737B42A"
+      },
+      {
+        "name": "OCTOPI_URL",
+        "value": "http://octopi.kk.int"
+      }
+    ],
+    "envFile": "../../workspace.env"
+  }
+]
