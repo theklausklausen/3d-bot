@@ -15,7 +15,7 @@ class OctoPi():
         self.shutdown_url = self.host + '/api/system/commands/core/shutdown'
         self.image_url = self.host + '/webcam/?action=snapshot'
         self.token = {
-            "x-api-key": os.environ.get('OCTOPI_TOKEN', 'abcdefghijklmnopqrstuvwxyz')}
+            'Authorization': 'Bearer {token}'.format(token=os.environ.get('OCTOPI_KEY', 'abcdefghijklmnopqrstuvwxyz'))}
 
     def get_status(self) -> Job | None:
         response = None
