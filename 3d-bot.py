@@ -1,6 +1,7 @@
 import asyncio
 import os
 import time
+import datetime
 from dotenv import load_dotenv
 
 from octopi import OctoPi
@@ -24,8 +25,8 @@ async def main():
         if not job:
             continue
         if job.has_quarter_achieved():
-            message = 'The job of {file} has reached {completion} %% of completion.\nETA: {eta}\n{link}'.format(
-                file=job.file, completion=job.progress['completion'], eta=job.progress['print_time_left'], link=octopi.host)
+            message = 'The job of {file} has reached {completion:.2f}% of completion.\nETA: {eta} hrs\n{link}'.format(
+                file=job.file, completion=job.progress['completion'], eta=str(datetime.timedelta(seconds=job.progress['print_time_left'])), link=octopi.host)
             image = octopi.get_image()
             await telegram.send_image(message, image)
 

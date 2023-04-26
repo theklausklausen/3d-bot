@@ -25,14 +25,12 @@ class OctoPi():
                 self.job_url, headers=self.token, timeout=5)
         except:
             self.logger.error_message(
-                'failed to request job state with status code {code}\n{message}'.format(code=response.status_code, message=response.json()))
-            # self.logger.error_message(
-            #     'failed to request job state, host probably unreachable')
+                'failed to request job state, host probably unreachable')
             return None
         self.logger.info_message('request succeeded')
         if response.status_code != 200:
-            # self.logger.error_message(
-            #     'failed to request job state with status code {code}'.format(code=response.status_code))
+            self.logger.error_message(
+                'failed to request job state with status code {code}\n{message}'.format(code=response.status_code, message=response.json()))
             return None
         response = response.json()
         if response.get('error') is not None:
