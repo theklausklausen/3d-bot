@@ -50,10 +50,7 @@ deploy:
   script:
     - ssh
       ${SWARM_MANAGER_USER}@${SWARM_MANAGER} 
-      "cd /mnt/clusterfs && 
-      docker service update 
-      --force 
-      --update-failure-action rollback 
-      --image ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}:latest
-      botfarm_${CI_PROJECT_NAME}"
+      "cd /mnt/clusterfs &&
+      docker service rm botfarm_${CI_PROJECT_NAME} && 
+      docker stack deploy -f botfarm.yml botfarm"
 
