@@ -37,12 +37,14 @@ class OctoPi():
             self.logger.error_message('failed to get status with error \"{error}\"'.format(
                 error=response.get('error')))
             return None
+
         job = Job(
             estimated_print_time=response.get('job')['estimatedPrintTime'],
             file=response.get('job')['file']['name'].replace('.gcode', ''),
             completion=response.get('progress')['completion'],
             print_time_left=response.get('progress')['printTimeLeft'],
             print_time=response.get('progress')['printTime'],
+            state=response.get('state'),
             debug=self.debug
         )
         return job

@@ -11,6 +11,7 @@ class Job():
         completion=None,
         print_time_left=None,
         print_time=None,
+        state=None,
         debug=False
     ):
         if cls._instance is None:
@@ -30,6 +31,8 @@ class Job():
                 75: None,
                 100: None
             }
+            cls.state = state
+            cls.lastState = None
             cls._instance.logger.debug_message('created new job object')
         else:
             cls._instance.logger.debug_message('return existing job object')
@@ -40,6 +43,8 @@ class Job():
                 'print_time_left': print_time_left,
                 'print_time': print_time
             }
+            cls._instance.lastState = cls._instance.state
+            cls._instance.state = state
         return cls._instance
 
     def __del__(self):
@@ -53,3 +58,6 @@ class Job():
                 self.states[value] = float(self.progress['completion'])
                 return True
         return False
+
+    def has_paused(self) -> bool:
+        return self.state == 'Paused' and self.state != self.lastState

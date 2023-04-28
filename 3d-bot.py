@@ -9,26 +9,44 @@ from job import Job
 from logger import Logger
 from telegram_client import Telegram
 
+debug = os.environ.get('DEBUG', default=False)
+logger = telegram = octopi = job = None
 
-async def main():
-    load_dotenv()
 
-    debug = os.environ.get('DEBUG', default=False)
-    Logger(debug=debug).info_message('starting up...')
-    sleep_time = int(os.environ.get('SLEEP_TIME', '5'))
+class Runtime():
+    logger = Logger(debug=debug)
     telegram = Telegram(debug=debug)
     octopi = OctoPi(debug=debug)
+    job = None
 
-    while True:
-        time.sleep(sleep_time)
-        job = octopi.get_status()
-        if not job:
-            continue
-        if job.has_quarter_achieved():
-            message = 'The job of {file} has reached {completion:.2f}% of completion.\nETA: {eta} hrs\n{link}'.format(
-                file=job.file, completion=job.progress['completion'], eta=str(datetime.timedelta(seconds=job.progress['print_time_left'])), link=octopi.host)
-            image = octopi.get_image()
-            await telegram.send_image(message, image)
+    async def sendState(self):
+        self.logger.info_message('sending state')
+        paused_message = 'Job paused, probably the filament is empty.\n\n' if self.job.has_paused() else ''
+        message = '{paused_message}The job of {file} has reached {completion:.2f}% of completion.\nETA: {eta} hrs\n{link}'.format(
+            paused_message=paused_message,
+            file=self.job.file,
+            completion=self.job.progress['completion'],
+            eta=str(datetime.timedelta(
+                seconds=self.job.progress['print_time_left'])),
+            link=self.octopi.host
+        )
+        image = self.octopi.get_image()
+        await self.telegram.send_image(message, image)
+
+    async def main(self):
+        load_dotenv()
+
+        self.logger.info_message('starting up...')
+        sleep_time = int(os.environ.get('SLEEP_TIME', '5'))
+
+        while True:
+            time.sleep(sleep_time)
+            self.job = self.octopi.get_status()
+            # if isinstance(job, Job):
+            if self.job.has_quarter_achieved() or self.job.has_paused():
+                await self.sendState()
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    runtime = Runtime()
+    asyncio.run(runtime.main())
