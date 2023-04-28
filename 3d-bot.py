@@ -42,9 +42,9 @@ class Runtime():
         while True:
             time.sleep(sleep_time)
             self.job = self.octopi.get_status()
-            # if isinstance(job, Job):
-            if self.job.has_quarter_achieved() or self.job.has_paused():
-                await self.sendState()
+            if isinstance(job, Job):
+                if self.job.has_quarter_achieved() or self.job.has_paused():
+                    await self.sendState()
 
 
 if __name__ == "__main__":
