@@ -52,5 +52,5 @@ deploy:
       ${SWARM_MANAGER_USER}@${SWARM_MANAGER} 
       "cd /mnt/clusterfs &&
       docker service rm botfarm_${CI_PROJECT_NAME} && 
-      docker stack deploy -f botfarm.yml botfarm"
+      docker stack deploy -c botfarm.yml botfarm"
 
