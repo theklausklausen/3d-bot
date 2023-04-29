@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM repo.kk.int/python-docker-image:latest
+ARG BASE_IMG=repo.kk.int/python-docker-image:latest
+FROM ${BASE_IMG}
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ARG USER=bot

@@ -4,6 +4,8 @@ services:
       build:
         context: .
         dockerfile: ./Dockerfile.dev
+        args:
+          - BASE_IMG=${BASE_IMG:-repo.kk.int/python-docker-image:latest}
       volumes:
         - ./:/app
       env_file:

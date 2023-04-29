@@ -68,10 +68,12 @@ class MQTT:
         ))
 
     def turnOnLight(self):
+        self.connectClient()
         self.publishMessage(self.lamp_topic, self.lamp_on)
         time.sleep(5)
 
     def turnOffLight(self):
+        self.connectClient()
         self.publishMessage(self.lamp_topic, self.lamp_off)
         time.sleep(5)
 
