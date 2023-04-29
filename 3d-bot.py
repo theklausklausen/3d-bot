@@ -9,7 +9,7 @@ from job import Job
 from logger import Logger
 from telegram_client import Telegram
 
-debug = os.environ.get('DEBUG', default=False)
+debug = os.environ.get('DEBUG', default=False) == 'True'
 logger = telegram = octopi = job = None
 
 
@@ -42,7 +42,7 @@ class Runtime():
         while True:
             time.sleep(sleep_time)
             self.job = self.octopi.get_status()
-            if isinstance(job, Job):
+            if isinstance(self.job, Job):
                 if self.job.has_quarter_achieved() or self.job.has_paused():
                     await self.sendState()
 
