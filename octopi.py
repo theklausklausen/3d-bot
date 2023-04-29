@@ -1,5 +1,6 @@
 import os
 import requests
+import logging
 
 from logger import Logger
 from job import Job
@@ -16,6 +17,9 @@ class OctoPi():
         self.image_url = self.host + '/webcam/?action=snapshot'
         self.token = {
             'Authorization': 'Bearer {token}'.format(token=os.environ.get('OCTOPI_KEY', 'abcdefghijklmnopqrstuvwxyz'))}
+        if not debug:
+            logging.getLogger('requests').setLevel(logging.INFO)
+            logging.getLogger('urllib3').setLevel(logging.INFO)
 
     def get_status(self) -> Job | None:
         response = None

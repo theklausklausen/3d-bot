@@ -2,6 +2,7 @@ import asyncio
 import os
 import time
 import datetime
+import logging
 from dotenv import load_dotenv
 
 from octopi import OctoPi
@@ -9,15 +10,17 @@ from job import Job
 from logger import Logger
 from telegram_client import Telegram
 
-debug = os.environ.get('DEBUG', default=False) == 'True'
 logger = telegram = octopi = job = None
 
 
 class Runtime():
+    debug = os.environ.get('DEBUG', default=False) == 'True'
     logger = Logger(debug=debug)
     telegram = Telegram(debug=debug)
     octopi = OctoPi(debug=debug)
     job = None
+    if not debug:
+        logging.getLogger('asyncio').setLevel(logging.INFO)
 
     async def sendState(self):
         self.logger.info_message('sending state')
@@ -47,6 +50,6 @@ class Runtime():
                     await self.sendState()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     runtime = Runtime()
     asyncio.run(runtime.main())
