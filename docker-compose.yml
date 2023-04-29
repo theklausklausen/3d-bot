@@ -3,7 +3,8 @@ services:
   3d-bot:
       build:
         context: .
-        dockerfile: ./Dockerfile.dev
+        dockerfile: ./Dockerfile
+        target: dev
         args:
           - BASE_IMG=${BASE_IMG:-repo.kk.int/python-docker-image:latest}
       volumes:

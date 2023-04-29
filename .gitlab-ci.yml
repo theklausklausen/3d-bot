@@ -27,6 +27,7 @@ build_production:
     - docker buildx inspect --bootstrap
     - docker buildx build 
       --platform ${PROJECT_PLATTFORMS}
+      --target prod
       --no-cache
       --push
       -f ${CI_PROJECT_DIR}/Dockerfile 

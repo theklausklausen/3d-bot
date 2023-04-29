@@ -1,5 +1,18 @@
-# syntax=docker/dockerfile:1
-FROM python:3
+ARG BASE_IMG=repo.kk.int/python-docker-image:latest
+FROM ${BASE_IMG} as dev
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ARG USER=bot
+WORKDIR /app
+COPY . /app/
+RUN useradd $USER && \
+    pip3 install --upgrade pip && \
+    pip3 install -r requirements.txt && \
+    pip3 install debugpy
+USER $USER
+CMD ["python3", "-m", "debugpy", "--listen", "0.0.0.0:3001", "3d-bot.py"]
+
+FROM repo.kk.int/python-docker-image:latest as prod
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ARG USER=bot

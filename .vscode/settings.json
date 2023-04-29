@@ -9,5 +9,8 @@
     "100",
     "--aggressive",
     "--in-place"
-  ]
+  ],
+  "files.exclude": {
+    "**/.git": false
+  }
 }
