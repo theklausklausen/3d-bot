@@ -44,7 +44,6 @@ Following commands will be called:
 ```python
 from octopi import OctoPi
 from job import Job
-from logger import Logger
 from telegram_client import Telegram
 
 # executed before state message is send
