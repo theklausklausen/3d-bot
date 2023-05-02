@@ -6,16 +6,7 @@
     "sortNum": 10000,
     "created": "2023-04-26T17:46:01.493Z",
     "modified": "2023-04-26T17:46:01.493Z",
-    "data": [
-      {
-        "name": "OCTOPI_KEY",
-        "value": "69FF5613BEE04D3980B7598C0737B42A"
-      },
-      {
-        "name": "OCTOPI_URL",
-        "value": "http://octopi.kk.int"
-      }
-    ],
+    "data": [],
     "envFile": "../../workspace.env"
   }
 ]
