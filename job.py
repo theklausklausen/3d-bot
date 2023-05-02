@@ -48,7 +48,7 @@ class Job():
         return cls._instance
 
     def __del__(self):
-        self.logger.info_message('deleting Telegram Client')
+        self.logger.info_message('deleting job instance')
 
     def has_quarter_achieved(self) -> bool:
         for key, value in enumerate(self.states):
@@ -61,3 +61,6 @@ class Job():
 
     def has_paused(self) -> bool:
         return self.state == 'Paused' and self.state != self.lastState
+
+    def has_finished(self) -> bool:
+        return self.states[100] is not None

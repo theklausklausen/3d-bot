@@ -23,4 +23,4 @@ RUN useradd $USER && \
     pip install --upgrade pip && \
     pip install -r requirements.txt
 USER $USER
-ENTRYPOINT [ "python3", "3d-bot.py"]
+CMD ["python3", "3d-bot.py"]
