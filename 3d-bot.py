@@ -37,7 +37,7 @@ class Runtime():
                 module = script_path.split('/')[-1].replace('.py', '')
                 import_path = script_path.replace(
                     '/{module}.py'.format(module=module), '')
-            except:
+            except Exception:
                 logger.error_message(
                     'CUSTOM_SCRIPT_PATH has to be like "/path/to/file.py"')
         else:
@@ -58,8 +58,6 @@ class Runtime():
             def preMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
                 print('*** pre message command ***')
 
-            pass
-
         # post message command
         try:
             postMessageCommand = getattr(__import__(
@@ -72,8 +70,6 @@ class Runtime():
 
             def postMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
                 print('*** post message command ***')
-
-            pass
 
         # post finished command
         try:
@@ -88,8 +84,6 @@ class Runtime():
             def postFinishedCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
                 print('*** post finished command ***')
 
-            pass
-
         # post filament empty command
         try:
             onFilamentEmptyCommand = getattr(__import__(
@@ -103,7 +97,6 @@ class Runtime():
             def onFilamentEmptyCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
                 print('*** post on filament empty command ***')
 
-            pass
     else:
         def preMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
             print('*** pre message command ***')
@@ -117,7 +110,7 @@ class Runtime():
         def onFilamentEmptyCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
             print('*** post on filament empty command ***')
 
-    async def sendState(self, prefix: str = ''):
+    async def send_state(self, prefix: str = ''):
         self.logger.info_message('sending state')
         message = '{prefix}The job of {file} has reached {completion:.2f}% of completion.\nETA: {eta} hrs\n{link}'.format(
             prefix=prefix,
@@ -130,7 +123,7 @@ class Runtime():
         image = self.octopi.get_image()
         await self.telegram.send_image(message, image)
 
-    async def main(self):
+    async def main(self) -> None:
         load_dotenv()
 
         self.logger.info_message('starting up...')
@@ -140,25 +133,28 @@ class Runtime():
             time.sleep(sleep_time)
             self.job = self.octopi.get_status()
             if isinstance(self.job, Job):
-                if self.job.has_paused():
-                    self.onFilamentEmptyCommand(
-                        telegram_client=self.telegram, job=job, octopi=self.octopi)
-                    await self.sendState(prefix='Job paused, probably the filament is empty.\n\n')
-                if self.job.has_quarter_achieved():
-                    try:
-                        self.preMessageCommand(
-                            telegram_client=self.telegram, job=job, octopi=self.octopi)
-                    except Exception as error:
-                        self.logger.error_message(error)
-                    await self.sendState()
-                    try:
-                        self.postMessageCommand(
-                            telegram_client=self.telegram, job=job, octopi=self.octopi)
-                    except Exception as error:
-                        self.logger.error_message(error)
-                    if self.job.has_finished():
-                        self.postFinishedCommand(
-                            telegram_client=self.telegram, job=job, octopi=self.octopi)
+                self.handle_job()
+
+    async def handle_job(self) -> None:
+        if self.job.has_paused():
+            self.onFilamentEmptyCommand(
+                telegram_client=self.telegram, job=job, octopi=self.octopi)
+            await self.sendState(prefix='Job paused, probably the filament is empty.\n\n')
+        if self.job.has_quarter_achieved():
+            try:
+                self.preMessageCommand(
+                    telegram_client=self.telegram, job=job, octopi=self.octopi)
+            except Exception as error:
+                self.logger.error_message(error)
+            await self.sendState()
+            try:
+                self.postMessageCommand(
+                    telegram_client=self.telegram, job=job, octopi=self.octopi)
+            except Exception as error:
+                self.logger.error_message(error)
+            if self.job.has_finished():
+                self.postFinishedCommand(
+                    telegram_client=self.telegram, job=job, octopi=self.octopi)
 
 
 if __name__ == '__main__':

@@ -27,7 +27,7 @@ class OctoPi():
         try:
             response = requests.get(
                 self.job_url, headers=self.token, timeout=5)
-        except:
+        except Exception:
             self.logger.error_message(
                 'failed to request job state, host probably unreachable')
             return None
