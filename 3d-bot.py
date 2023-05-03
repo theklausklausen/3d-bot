@@ -41,7 +41,7 @@ class Runtime():
                 logger.error_message(
                     'CUSTOM_SCRIPT_PATH has to be like "/path/to/file.py"')
         else:
-            raise ImportError('{script} not founf'.format(script=script_path))
+            raise ImportError('{script} not found'.format(script=script_path))
 
     if module:
         sys.path.insert(1, import_path)
