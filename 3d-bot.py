@@ -133,20 +133,20 @@ class Runtime():
             time.sleep(sleep_time)
             self.job = self.octopi.get_status()
             if isinstance(self.job, Job):
-                self.handle_job()
+                await self.handle_job()
 
     async def handle_job(self) -> None:
         if self.job.has_paused():
             self.onFilamentEmptyCommand(
                 telegram_client=self.telegram, job=job, octopi=self.octopi)
-            await self.sendState(prefix='Job paused, probably the filament is empty.\n\n')
+            await self.send_state(prefix='Job paused, probably the filament is empty.\n\n')
         if self.job.has_quarter_achieved():
             try:
                 self.preMessageCommand(
                     telegram_client=self.telegram, job=job, octopi=self.octopi)
             except Exception as error:
                 self.logger.error_message(error)
-            await self.sendState()
+            await self.send_state()
             try:
                 self.postMessageCommand(
                     telegram_client=self.telegram, job=job, octopi=self.octopi)
