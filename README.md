@@ -26,14 +26,13 @@ The bot should now be up and running. You can interact with it by searching for 
 
 Here are some of the commands that you can use with 3D-Bot:
 
-- `/start` - Start the bot.
-- `/help` - Get a list of available commands.
-- `/status` - Get the current status of your 3D printer.
-- `/printinfo` - Get information about the current print, including the estimated time remaining and the amount of filament used.
-- `/pause` - Pause the current print.
-- `/resume` - Resume the current print.
-- `/cancel` - Cancel the current print.
-- `/filament` - Get the current amount of filament remaining.
+- `/help` - Get a list of available commands. (not implemented yet)
+- `/status` - Get the current status of your 3D printer. (not implemented yet)
+- `/printinfo` - Get information about the current print, including the estimated time remaining and the amount of filament used. (not implemented yet)
+- `/pause` - Pause the current print. (not implemented yet)
+- `/resume` - Resume the current print. (not implemented yet)
+- `/cancel` - Cancel the current print. (not implemented yet)
+- `/filament` - Get the current amount of filament remaining. (not implemented yet)
 
 ### Custom Scripts
 
@@ -59,7 +58,7 @@ def postFinishCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi)
     print('post finish command')
 
 # executed when printer run out of filament
-def onFilamentEmptyCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> Nonde:
+def onFilamentEmptyCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     print('on filament empty command')
 ```
 
