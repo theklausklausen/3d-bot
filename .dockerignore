@@ -1,3 +1,4 @@
+.vscode
 .dockerignore
 *.env
 .git
@@ -6,3 +7,8 @@
 __pycache__
 README.md
 workspace.env.encrypted
+docker-compose
+Dockerfile
+example-custom-script.py
+LICENSE
+workspace.env*

@@ -15,8 +15,8 @@ To run 3D-Bot, you will need:
 ### Installation
 
 1. Clone this repository to your local machine.
-2. Create a copy of the `.env.sample` file and name it `.env`.
-3. Edit the `.env` file and add your Telegram API token.
+2. Create a copy of the `workspace.env.example` file and name it `workspace.env`.
+3. Edit the `workspace.env` file and add your Telegram API token.
 4. Build the Docker image by running `docker-compose build`.
 5. Start the container by running `docker-compose up -d`.
 
