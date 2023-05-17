@@ -27,14 +27,14 @@ class OctoPi():
         try:
             response = requests.get(
                 self.job_url, headers=self.token, timeout=5)
-        except Exception:
+        except Exception as error:
             self.logger.error_message(
-                'failed to request job state, host probably unreachable')
+                'failed to request job state:\n{error}'.format(error=error))
             return None
         self.logger.info_message('request succeeded')
         if response.status_code != 200:
             self.logger.error_message(
-                'failed to request job state with status code {code}\n{message}'.format(code=response.status_code, message=response.json()))
+                'failed to request job state with status code {code}\n{message}'.format(code=response.status_code, message=response))
             return None
         response = response.json()
         if response.get('error') is not None:
@@ -44,11 +44,12 @@ class OctoPi():
 
         job = Job(
             estimated_print_time=response.get('job')['estimatedPrintTime'],
-            file=response.get('job')['file']['name'].replace('.gcode', ''),
+            file=response.get('job')['file']['name'].replace('.gcode', '') if response.get('job')['file']['name'] else None,
             completion=response.get('progress')['completion'],
             print_time_left=response.get('progress')['printTimeLeft'],
             print_time=response.get('progress')['printTime'],
             state=response.get('state'),
+            filament=response.get('job')['filament']['tool0']['length'] if 'tool0' in response.get('job')['filament'] else 0,
             debug=self.debug
         )
         return job

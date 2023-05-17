@@ -1,19 +1,60 @@
 import paho.mqtt.client as mqtt
 import time
 import os
+import requests
 from octopi import OctoPi
 from job import Job
 from logger import Logger
 from telegram_client import Telegram
 
 
-def preMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi):
+def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+    logger = Logger()
+    if(job.has_finished()):
+        payload = {
+            'absolute': True,
+            'y': -150,
+            'command': 'jog'
+        }
+        logger.info_message('request to move bed to center')
+        try:
+            response = requests.post(
+                '{host}/api/printer/printhead'.format(host=octopi.host), headers=octopi.token, json=payload, timeout=5)
+        except Exception as error:
+            logger.error_message(
+                'failed to request moving\n{error}'.format(error=error))
+        time.sleep(15)
     MQTT().turnOnLight()
 
-
-def postMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi):
+def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     MQTT().turnOffLight()
+    
+def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+    logger = Logger()
+    payload = {
+        'absolute': True,
+        'y': 150,
+        'command': 'jog'
+    }
+    logger.info_message('request to move bed to front')
+    try:
+        response = requests.post(
+            '{host}/api/printer/printhead'.format(host=octopi.host), headers=octopi.token, json=payload, timeout=5)
+    except Exception as error:
+        logger.error_message(
+            'failed to request moving\n{error}'.format(error=error))
+    time.sleep(15)
 
+    logger.info_message('request shutdown')
+    try:
+        requests.post(
+            '{host}/api/system/commands/core/shutdown'.format(host=octopi.host), headers=octopi.token, timeout=5)
+    except Exception as error:
+        logger.error_message(
+            'failed to request shutting off\n{error}'.format(error=error))
+    MQTT().turnOffPrinter()
+    time.sleep(120)
+    MQTT().turnOffOctoPi()
 
 class MQTT:
 
@@ -47,6 +88,12 @@ class MQTT:
             cls._instance.client = cls._instance.initClient()
             cls._instance.connectClient()
             cls._instance.client.on_connect = cls._instance.on_connect
+            cls._instance.printer_topic = os.environ.get(
+                'MQTT_PRINTER_TOPIC', '/command/topic')
+            cls._instance.printer_off = os.environ.get('MQTT_PRINTER_OFF', 'off')
+            cls._instance.octopi_topic = os.environ.get(
+                'MQTT_OCTOPI_TOPIC', '/command/topic')
+            cls._instance.octopi_off = os.environ.get('MQTT_OCTOPI_OFF', 'off')
 
         return cls._instance
 
@@ -76,6 +123,8 @@ class MQTT:
         ))
         try:
             result = self.client.connect(self.host, self.port)
+            if(result != 0):
+                self.logger.error_message('failed to connect to MQTT server')
         except Exception as error:
             self.logger.error_message('failed mqtt connection to {host}:{port} with result {result}'.format(
                 host=self.host, port=self.port, result=error))
@@ -100,6 +149,16 @@ class MQTT:
     def turnOffLight(self):
         self.connectClient()
         self.publishMessage(self.lamp_topic, self.lamp_off)
+        time.sleep(5)
+
+    def turnOffPrinter(self):
+        self.connectClient()
+        self.publishMessage(self.printer_topic, self.printer_off)
+        time.sleep(5)
+
+    def turnOffOctoPi(self):
+        self.connectClient()
+        self.publishMessage(self.octopi_topic, self.octopi_off)
         time.sleep(5)
 
     def publishMessage(self, topic: str, payload: str):

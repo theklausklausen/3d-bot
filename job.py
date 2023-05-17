@@ -11,6 +11,7 @@ class Job():
         completion=None,
         print_time_left=None,
         print_time=None,
+        filament=None,
         state=None,
         debug=False
     ):
@@ -31,6 +32,7 @@ class Job():
                 75: None,
                 100: None
             }
+            cls.filament = filament
             cls.state = state
             cls.lastState = None
             cls._instance.logger.debug_message('created new job object')
@@ -52,6 +54,8 @@ class Job():
 
     def has_quarter_achieved(self) -> bool:
         for key, value in enumerate(self.states):
+            if(not self.progress['completion']):
+                return False
             if int(self.progress['completion']) >= int(value) and self.states[value] is None:
                 self.logger.debug_message('set state {state} to {value}'.format(
                     state=value, value=self.progress['completion']))
@@ -63,4 +67,4 @@ class Job():
         return self.state == 'Paused' and self.state != self.lastState
 
     def has_finished(self) -> bool:
-        return self.states[100] is not None
+        return True if self.states[100] is not None else False

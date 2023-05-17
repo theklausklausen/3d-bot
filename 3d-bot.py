@@ -5,119 +5,119 @@ import datetime
 import logging
 from dotenv import load_dotenv
 import sys
-import subprocess
+# import subprocess
 
 from octopi import OctoPi
 from job import Job
 from logger import Logger
 from telegram_client import Telegram
 
-logger = telegram = octopi = job = None
+telegram = octopi = job = None
+debug = os.environ.get('DEBUG', default="False") == 'True'
+logger = Logger(debug=debug)
+module = import_path = script_path = None
 
+try:
+    script_path = os.environ.get('CUSTOM_SCRIPT_PATH')
+except EnvironmentError:
+    pass
+
+if script_path:
+    if os.path.isfile(script_path):
+        try:
+            module = script_path.split('/')[-1].replace('.py', '')
+            import_path = script_path.replace(
+                '/{module}.py'.format(module=module), '')
+        except Exception:
+            logger.error_message(
+                'CUSTOM_SCRIPT_PATH has to be like "/path/to/file.py"')
+    else:
+        raise ImportError('{script} not found'.format(script=script_path))
+
+if module:
+    sys.path.insert(1, import_path)
+
+    # pre message command
+    try:
+        pre_message_command = getattr(__import__(
+            module, fromlist=['pre_message_command']), 'pre_message_command')
+        logger.info_message(message='found \"pre_message_command\" function')
+    except AttributeError:
+        logger.info_message(
+            message='no \"pre_message_command\" function found, using default definition')
+
+        def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+            print('*** pre message command ***')
+
+    # post message command
+    try:
+        post_message_command = getattr(__import__(
+            module, fromlist=['post_message_command']), 'post_message_command')
+        logger.info_message(
+            message='found \"post_message_command\" function')
+    except AttributeError:
+        logger.info_message(
+            message='no \"post_message_command\" function found, using default definition')
+
+        def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+            print('*** post message command ***')
+
+    # post finished command
+    try:
+        post_finished_command = getattr(__import__(
+            module, fromlist=['post_finished_command']), 'post_finished_command')
+        logger.info_message(
+            message='found \"post_finished_command\" function')
+    except AttributeError:
+        logger.info_message(
+            message='no \"post_finished_command\" function found, using default definition')
+
+        def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+            print('*** post finished command ***')
+
+    # post filament empty command
+    try:
+        on_filament_empty_command = getattr(__import__(
+            module, fromlist=['on_filament_empty_command']), 'on_filament_empty_command')
+        logger.info_message(
+            message='found \"on_filament_empty_command\" function')
+    except AttributeError:
+        logger.info_message(
+            message='no \"on_filament_empty_command\" function found, using default definition')
+
+        def on_filament_empty_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+            print('*** post on filament empty command ***')
+
+else:
+    def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+        print('*** pre message command ***')
+
+    def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+        print('*** post message command ***')
+
+    def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+        print('*** post finished command ***')
+
+    def on_filament_empty_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+        print('*** post on filament empty command ***')
 
 class Runtime():
-    debug = os.environ.get('DEBUG', default=False) == 'True'
-    logger = Logger(debug=debug)
     telegram = Telegram(debug=debug)
     octopi = OctoPi(debug=debug)
     job = None
     if not debug:
         logging.getLogger('asyncio').setLevel(logging.INFO)
 
-    module = import_path = script_path = None
-
-    try:
-        script_path = os.environ.get('CUSTOM_SCRIPT_PATH')
-    except EnvironmentError:
-        pass
-
-    if script_path:
-        if os.path.isfile(script_path):
-            try:
-                module = script_path.split('/')[-1].replace('.py', '')
-                import_path = script_path.replace(
-                    '/{module}.py'.format(module=module), '')
-            except Exception:
-                logger.error_message(
-                    'CUSTOM_SCRIPT_PATH has to be like "/path/to/file.py"')
-        else:
-            raise ImportError('{script} not found'.format(script=script_path))
-
-    if module:
-        sys.path.insert(1, import_path)
-
-        # pre message command
-        try:
-            preMessageCommand = getattr(__import__(
-                module, fromlist=['preMessageCommand']), 'preMessageCommand')
-            logger.info_message(message='found \"preMessageCommand\" function')
-        except AttributeError:
-            logger.info_message(
-                message='no \"preMessageCommand\" function found, using default definition')
-
-            def preMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-                print('*** pre message command ***')
-
-        # post message command
-        try:
-            postMessageCommand = getattr(__import__(
-                module, fromlist=['postMessageCommand']), 'postMessageCommand')
-            logger.info_message(
-                message='found \"postMessageCommand\" function')
-        except AttributeError:
-            logger.info_message(
-                message='no \"postMessageCommand\" function found, using default definition')
-
-            def postMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-                print('*** post message command ***')
-
-        # post finished command
-        try:
-            postFinishedCommand = getattr(__import__(
-                module, fromlist=['postFinishedCommand']), 'postFinishedCommand')
-            logger.info_message(
-                message='found \"postFinishedCommand\" function')
-        except AttributeError:
-            logger.info_message(
-                message='no \"postFinishedCommand\" function found, using default definition')
-
-            def postFinishedCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-                print('*** post finished command ***')
-
-        # post filament empty command
-        try:
-            onFilamentEmptyCommand = getattr(__import__(
-                module, fromlist=['onFilamentEmptyCommand']), 'onFilamentEmptyCommand')
-            logger.info_message(
-                message='found \"onFilamentEmptyCommand\" function')
-        except AttributeError:
-            logger.info_message(
-                message='no \"onFilamentEmptyCommand\" function found, using default definition')
-
-            def onFilamentEmptyCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-                print('*** post on filament empty command ***')
-
-    else:
-        def preMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** pre message command ***')
-
-        def postMessageCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** post message command ***')
-
-        def postFinishedCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** post finished command ***')
-
-        def onFilamentEmptyCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** post on filament empty command ***')
-
     async def send_state(self, prefix: str = ''):
-        self.logger.info_message('sending state')
-        message = '{prefix}The job of {file} has reached {completion:.2f}% of completion.\nETA: {eta} hrs\n{link}'.format(
+        logger.info_message('sending state')
+        message = '{prefix}The job of {file} has reached {completion:.2f}% of completion.\nFilament usage: ~ {current:.2f}m / {planned:.2f}m\nETA: {eta} hrs\n{link}'.format(
             prefix=prefix,
             file=self.job.file,
             completion=self.job.progress['completion'],
             eta=str(datetime.timedelta(
                 seconds=self.job.progress['print_time_left'])),
+            planned=(self.job.filament/1000),
+            current=((self.job.filament*(self.job.progress['completion']*0.01))/1000),
             link=self.octopi.host
         )
         image = self.octopi.get_image()
@@ -126,7 +126,7 @@ class Runtime():
     async def main(self) -> None:
         load_dotenv()
 
-        self.logger.info_message('starting up...')
+        logger.info_message('starting up...')
         sleep_time = int(os.environ.get('SLEEP_TIME', '5'))
 
         while True:
@@ -137,25 +137,30 @@ class Runtime():
 
     async def handle_job(self) -> None:
         if self.job.has_paused():
-            self.onFilamentEmptyCommand(
-                telegram_client=self.telegram, job=job, octopi=self.octopi)
+            try:
+                on_filament_empty_command(
+                    telegram_client=self.telegram, job=self.job, octopi=self.octopi)
+            except Exception as error:  
+                logger.error_message(error)
             await self.send_state(prefix='Job paused, probably the filament is empty.\n\n')
         if self.job.has_quarter_achieved():
             try:
-                self.preMessageCommand(
-                    telegram_client=self.telegram, job=job, octopi=self.octopi)
+                pre_message_command(
+                    telegram_client=self.telegram, job=self.job, octopi=self.octopi)
             except Exception as error:
-                self.logger.error_message(error)
+                logger.error_message(error)
             await self.send_state()
             try:
-                self.postMessageCommand(
-                    telegram_client=self.telegram, job=job, octopi=self.octopi)
+                post_message_command(
+                    telegram_client=self.telegram, job=self.job, octopi=self.octopi)
             except Exception as error:
-                self.logger.error_message(error)
+                logger.error_message(error)
             if self.job.has_finished():
-                self.postFinishedCommand(
-                    telegram_client=self.telegram, job=job, octopi=self.octopi)
-
+                try:
+                    post_finished_command(
+                        telegram_client=self.telegram, job=self.job, octopi=self.octopi)
+                except Exception as error:
+                    logger.error_message(error)
 
 if __name__ == '__main__':
     runtime = Runtime()

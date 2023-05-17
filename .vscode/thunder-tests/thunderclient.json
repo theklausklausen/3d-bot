@@ -16,5 +16,46 @@
       "bearer": "{{OCTOPI_KEY}}"
     },
     "tests": []
+  },
+  {
+    "_id": "497851bd-c73b-4b73-be41-25113a1b6da9",
+    "colId": "56b64a7e-ff92-49cd-b2cb-348133ee4218",
+    "containerId": "",
+    "name": "Post Move Bed",
+    "url": "{{OCTOPI_URL}}/api/printer/printhead",
+    "method": "POST",
+    "sortNum": 20000,
+    "created": "2023-05-17T17:14:06.130Z",
+    "modified": "2023-05-17T17:41:56.324Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"absolute\": true,\n    \"y\": 150,\n    \"command\": \"jog\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{OCTOPI_KEY}}"
+    },
+    "tests": []
+  },
+  {
+    "_id": "8ed43194-c432-4d6b-a422-f763f07a951e",
+    "colId": "56b64a7e-ff92-49cd-b2cb-348133ee4218",
+    "containerId": "",
+    "name": "Get Printer Stats",
+    "url": "{{OCTOPI_URL}}/api/printer",
+    "method": "GET",
+    "sortNum": 15000,
+    "created": "2023-05-17T17:16:38.573Z",
+    "modified": "2023-05-17T17:17:04.029Z",
+    "headers": [],
+    "params": [],
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{OCTOPI_KEY}}"
+    },
+    "tests": []
   }
 ]
