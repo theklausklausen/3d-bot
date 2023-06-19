@@ -41,6 +41,10 @@ class OctoPi():
             self.logger.error_message('failed to get status with error \"{error}\"'.format(
                 error=response.get('error')))
             return None
+        
+        filament = 0
+        if(not not response.get('job')['filament']):
+            filament=response.get('job')['filament']['tool0']['length'] if 'tool0' in response.get('job')['filament'] else 0
 
         job = Job(
             estimated_print_time=response.get('job')['estimatedPrintTime'],
@@ -49,7 +53,7 @@ class OctoPi():
             print_time_left=response.get('progress')['printTimeLeft'],
             print_time=response.get('progress')['printTime'],
             state=response.get('state'),
-            filament=response.get('job')['filament']['tool0']['length'] if 'tool0' in response.get('job')['filament'] else 0,
+            filament=filament,
             debug=self.debug
         )
         return job
