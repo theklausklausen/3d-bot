@@ -28,6 +28,11 @@ def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> 
 
 def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     MQTT().turnOffLight()
+
+def on_overheating_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+    MQTT().turnOffPrinter()
+    time.sleep(5)
+    MQTT().turnOffOctoPi()
     
 def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     logger = Logger()

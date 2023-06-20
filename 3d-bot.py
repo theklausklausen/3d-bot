@@ -17,6 +17,17 @@ debug = os.environ.get('DEBUG', default="False") == 'True'
 logger = Logger(debug=debug)
 module = import_path = script_path = None
 
+if os.environ.get('SENTRY_GLITCHTIP_DSN'):
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_GLITCHTIP_DSN', default='localhost'),
+        auto_session_tracking=False,
+        environment='development' if debug else 'production',
+        debug=debug,
+        send_default_pii=debug,
+        traces_sample_rate=0.01
+    )
+
 try:
     script_path = os.environ.get('CUSTOM_SCRIPT_PATH')
 except EnvironmentError:
@@ -88,6 +99,19 @@ if module:
         def on_filament_empty_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
             print('*** post on filament empty command ***')
 
+    # on overheating command
+    try:
+        on_overheating_command = getattr(__import__(
+            module, fromlist=['on_overheating_command']), 'on_overheating_command')
+        logger.info_message(
+            message='found \"on_overheating_command\" function')
+    except AttributeError:
+        logger.info_message(
+            message='no \"on_overheating_command\" function found, using default definition')
+
+        def on_overheating_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
+            print('*** on overheating command command ***')
+
 else:
     def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
         print('*** pre message command ***')
@@ -131,6 +155,23 @@ class Runtime():
 
         while True:
             time.sleep(sleep_time)
+            if (not self.octopi.temp_is_ok()):
+                try:
+                    pre_message_command(
+                        telegram_client=self.telegram, job=self.job, octopi=self.octopi)
+                except Exception as error:
+                    logger.error_message(error)
+                await self.send_state()
+                try:
+                    post_message_command(
+                        telegram_client=self.telegram, job=self.job, octopi=self.octopi)
+                except Exception as error:
+                    logger.error_message(error)
+                try:
+                    on_overheating_command(
+                        telegram_client=self.telegram, job=self.job, octopi=self.octopi)
+                except Exception as error:
+                    logger.error_message(error)
             self.job = self.octopi.get_status()
             if isinstance(self.job, Job):
                 await self.handle_job()
