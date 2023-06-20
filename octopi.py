@@ -85,17 +85,27 @@ class OctoPi():
                 error=response.get('error')))
             return None
         
+        estimated_print_time=response.get('job')['estimatedPrintTime']
+        file=response.get('job')['file']['name'].replace('.gcode', '') if response.get('job')['file']['name'] else None
+        completion=response.get('progress')['completion']
+        print_time_left=response.get('progress')['printTimeLeft']
+        print_time=response.get('progress')['printTime']
+        state=response.get('state')
         filament = 0
         if(not not response.get('job')['filament']):
             filament=response.get('job')['filament']['tool0']['length'] if 'tool0' in response.get('job')['filament'] else 0
 
+        self.logger.info_message(
+            f'estimated print time: {estimated_print_time} | file: {file} | completion: {completion} | print time left: {print_time_left} | print time: {print_time} | state: {state}filament: {filament}'
+        )
+
         job = Job(
-            estimated_print_time=response.get('job')['estimatedPrintTime'],
-            file=response.get('job')['file']['name'].replace('.gcode', '') if response.get('job')['file']['name'] else None,
-            completion=response.get('progress')['completion'],
-            print_time_left=response.get('progress')['printTimeLeft'],
-            print_time=response.get('progress')['printTime'],
-            state=response.get('state'),
+            estimated_print_time=estimated_print_time,
+            file=file,
+            completion=completion,
+            print_time_left=print_time_left,
+            print_time=print_time,
+            state=state,
             filament=filament,
             debug=self.debug
         )
