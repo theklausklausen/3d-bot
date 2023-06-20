@@ -13,7 +13,7 @@ from logger import Logger
 from telegram_client import Telegram
 
 telegram = octopi = job = None
-debug = os.environ.get('DEBUG', default="False") == 'True'
+debug = os.environ.get('DEBUG', default='False') == 'True'
 logger = Logger(debug=debug)
 module = import_path = script_path = None
 
@@ -25,7 +25,8 @@ if os.environ.get('SENTRY_GLITCHTIP_DSN'):
         environment='development' if debug else 'production',
         debug=debug,
         send_default_pii=debug,
-        traces_sample_rate=0.01
+        traces_sample_rate=0.01,
+        ca_certs=os.environ.get('CA_CERTS_PATH', default=None)
     )
 
 try:
