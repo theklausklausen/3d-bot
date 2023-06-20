@@ -96,7 +96,7 @@ class OctoPi():
             filament=response.get('job')['filament']['tool0']['length'] if 'tool0' in response.get('job')['filament'] else 0
 
         self.logger.info_message(
-            f'estimated print time: {estimated_print_time} | file: {file} | completion: {completion} | print time left: {print_time_left} | print time: {print_time} | state: {state}filament: {filament}'
+            f'estimated print time: {estimated_print_time} | file: {file} | completion: {completion} | print time left: {print_time_left} | print time: {print_time} | state: {state} | filament: {filament}'
         )
 
         job = Job(
