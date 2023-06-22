@@ -4,6 +4,7 @@ import logging
 
 from logger import Logger
 from job import Job
+from errors import *
 
 
 class OctoPi():
@@ -42,12 +43,13 @@ class OctoPi():
                     self.printer_state_url, headers=self.token, timeout=5)
             except Exception as error:
                 self.logger.error_message(
-                    'failed to request printer state:\n{error}'.format(error=error))
+                    f'{HOST_UNREACHABLE}: failed requesting {self.printer_state_url}')
             self.logger.info_message('request succeeded')
+            if response is None:
+                    return None
             if response.status_code != 200:
                 self.logger.error_message(
                     'failed to request job state with status code {code}\n{message}'.format(code=response.status_code, message=response))
-                return None
             response = response.json()
             if response.get('error') is not None:
                 self.logger.error_message('failed to get status with error \"{error}\"'.format(
@@ -72,7 +74,8 @@ class OctoPi():
                 self.job_url, headers=self.token, timeout=5)
         except Exception as error:
             self.logger.error_message(
-                'failed to request job state:\n{error}'.format(error=error))
+                    f'{HOST_UNREACHABLE}: failed requesting {self.job_url}')
+        if response is None:
             return None
         self.logger.info_message('request succeeded')
         if response.status_code != 200:

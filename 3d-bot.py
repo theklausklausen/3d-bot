@@ -11,23 +11,15 @@ from octopi import OctoPi
 from job import Job
 from logger import Logger
 from telegram_client import Telegram
+from errors import *
+from sentry import init_sentry
 
 telegram = octopi = job = None
 debug = os.environ.get('DEBUG', default='False') == 'True'
 logger = Logger(debug=debug)
 module = import_path = script_path = None
 
-if os.environ.get('SENTRY_GLITCHTIP_DSN'):
-    import sentry_sdk
-    sentry_sdk.init(
-        dsn=os.environ.get('SENTRY_GLITCHTIP_DSN', default='localhost'),
-        auto_session_tracking=False,
-        environment='development' if debug else 'production',
-        debug=debug,
-        send_default_pii=debug,
-        traces_sample_rate=0.01,
-        ca_certs=os.environ.get('CA_CERTS_PATH', default=None)
-    )
+init_sentry(debug=debug)
 
 try:
     script_path = os.environ.get('CUSTOM_SCRIPT_PATH')
@@ -156,7 +148,8 @@ class Runtime():
 
         while True:
             time.sleep(sleep_time)
-            if (not self.octopi.temp_is_ok()):
+            temp_is_ok = self.octopi.temp_is_ok()
+            if (isinstance(temp_is_ok, bool) and not temp_is_ok):
                 try:
                     pre_message_command(
                         telegram_client=self.telegram, job=self.job, octopi=self.octopi)
@@ -174,7 +167,7 @@ class Runtime():
                 except Exception as error:
                     logger.error_message(error)
             self.job = self.octopi.get_status()
-            if isinstance(self.job, Job):
+            if self.job is not None:
                 await self.handle_job()
 
     async def handle_job(self) -> None:
