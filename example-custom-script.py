@@ -134,7 +134,7 @@ class MQTT:
             result = self.client.connect(self.host, self.port)
             if (result != 0):
                 self.logger.error_message(
-                    '{__name__} failed to connect to MQTT server')
+                    f'{__name__} failed to connect to MQTT server')
         except Exception as error:
             self.logger.error_message(
                 f'{__name__} failed mqtt connection to {self.host}:{self.port} with result {result}')

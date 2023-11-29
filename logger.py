@@ -32,3 +32,6 @@ class Logger:
 
     def error_message(self, message):
         self.log.error(message)
+
+    def warn_message(self, message):
+        self.log.warn(message)

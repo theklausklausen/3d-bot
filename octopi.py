@@ -29,7 +29,7 @@ class OctoPi():
                 self.bed_temp_max = int(self.bed_temp_max)
             except:
                 self.logger.error_message(
-                    '{__name__} OCTOPI_BED_TEMP_MAX is not a valid integer')
+                    f'{__name__} OCTOPI_BED_TEMP_MAX is not a valid integer')
         self.tool_temp_max = os.environ.get(
             'OCTOPI_TOOL_TEMP_MAX', default=None)
         if (self.tool_temp_max is not None):
@@ -37,7 +37,7 @@ class OctoPi():
                 self.tool_temp_max = int(self.tool_temp_max)
             except:
                 self.logger.error_message(
-                    '{__name__} OCTOPI_TOOL_TEMP_MAX is not a valid integer')
+                    f'{__name__} OCTOPI_TOOL_TEMP_MAX is not a valid integer')
 
     def temp_is_ok(self) -> bool:
         if (isinstance(self.bed_temp_max, int) or isinstance(self.tool_temp_max, int)):
@@ -53,7 +53,7 @@ class OctoPi():
                 return None
             if response.status_code != 200:
                 self.logger.error_message(
-                    'failed to request job state with status code {response.status_code}\n{response}')
+                    f'failed to request job state with status code {response.status_code}\n{response}')
             response = response.json()
             if response.get(f'error') is not None:
                 error = response.get(f'error')
@@ -62,7 +62,7 @@ class OctoPi():
                 return None
             if (response.get(f'temperature') is None):
                 self.logger.error_message(
-                    '{__name__} could not determine temperatures, assuming all fine')
+                    f'{__name__} could not determine temperatures, assuming all fine')
                 return True
             if (response.get(f'temperature')['bed']['actual'] > self.bed_temp_max):
                 self.logger.error_message(f'{__name__} BED IS OVERHEATING!')
@@ -79,7 +79,7 @@ class OctoPi():
             response = requests.get(
                 self.job_url, headers=self.token, timeout=5)
         except Exception as error:
-            self.logger.error_message(
+            self.logger.warn_message(
                 f'{HOST_UNREACHABLE}: failed requesting {self.job_url}')
         if response is None:
             return None
