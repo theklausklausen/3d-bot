@@ -118,6 +118,7 @@ else:
     def on_filament_empty_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
         print('*** post on filament empty command ***')
 
+
 class Runtime():
     telegram = Telegram(debug=debug)
     octopi = OctoPi(debug=debug)
@@ -126,7 +127,7 @@ class Runtime():
         logging.getLogger('asyncio').setLevel(logging.INFO)
 
     async def send_state(self, prefix: str = ''):
-        logger.info_message('sending state')
+        logger.info_message('{__name__} sending state')
         message = '{prefix}The job of {file} has reached {completion:.2f}% of completion.\nFilament usage: ~ {current:.2f}m / {planned:.2f}m\nETA: {eta} hrs\n{link}'.format(
             prefix=prefix,
             file=self.job.file,
@@ -134,7 +135,8 @@ class Runtime():
             eta=str(datetime.timedelta(
                 seconds=self.job.progress['print_time_left'])),
             planned=(self.job.filament/1000),
-            current=((self.job.filament*(self.job.progress['completion']*0.01))/1000),
+            current=(
+                (self.job.filament*(self.job.progress['completion']*0.01))/1000),
             link=self.octopi.host
         )
         image = self.octopi.get_image()
@@ -143,7 +145,7 @@ class Runtime():
     async def main(self) -> None:
         load_dotenv()
 
-        logger.info_message('starting up...')
+        logger.info_message('{__name__} starting up...')
         sleep_time = int(os.environ.get('SLEEP_TIME', '5'))
 
         while True:
@@ -175,7 +177,7 @@ class Runtime():
             try:
                 on_filament_empty_command(
                     telegram_client=self.telegram, job=self.job, octopi=self.octopi)
-            except Exception as error:  
+            except Exception as error:
                 logger.error_message(error)
             await self.send_state(prefix='Job paused, probably the filament is empty.\n\n')
         if self.job.has_quarter_achieved():
@@ -196,6 +198,7 @@ class Runtime():
                         telegram_client=self.telegram, job=self.job, octopi=self.octopi)
                 except Exception as error:
                     logger.error_message(error)
+
 
 if __name__ == '__main__':
     runtime = Runtime()

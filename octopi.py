@@ -27,16 +27,19 @@ class OctoPi():
             try:
                 self.bed_temp_max = int(self.bed_temp_max)
             except:
-                self.logger.error_message('OCTOPI_BED_TEMP_MAX is not a valid integer')
-        self.tool_temp_max = os.environ.get('OCTOPI_TOOL_TEMP_MAX', default=None)
+                self.logger.error_message(
+                    '{__name} OCTOPI_BED_TEMP_MAX is not a valid integer')
+        self.tool_temp_max = os.environ.get(
+            'OCTOPI_TOOL_TEMP_MAX', default=None)
         if (self.tool_temp_max is not None):
             try:
                 self.tool_temp_max = int(self.tool_temp_max)
             except:
-                self.logger.error_message('OCTOPI_TOOL_TEMP_MAX is not a valid integer')
+                self.logger.error_message(
+                    '{__name} OCTOPI_TOOL_TEMP_MAX is not a valid integer')
 
     def temp_is_ok(self) -> bool:
-        if(isinstance(self.bed_temp_max, int) or isinstance(self.tool_temp_max, int)):
+        if (isinstance(self.bed_temp_max, int) or isinstance(self.tool_temp_max, int)):
             response = None
             try:
                 response = requests.get(
@@ -44,59 +47,62 @@ class OctoPi():
             except Exception as error:
                 self.logger.error_message(
                     f'{HOST_UNREACHABLE}: failed requesting {self.printer_state_url}')
-            self.logger.info_message('request succeeded')
+            self.logger.info_message('{__name__} request succeeded')
             if response is None:
-                    return None
+                return None
             if response.status_code != 200:
                 self.logger.error_message(
                     'failed to request job state with status code {code}\n{message}'.format(code=response.status_code, message=response))
             response = response.json()
             if response.get('error') is not None:
-                self.logger.error_message('failed to get status with error \"{error}\"'.format(
+                self.logger.error_message('{__name__} failed to get status with error \"{error}\"'.format(
                     error=response.get('error')))
                 return None
-            if(response.get('temperature') is None):
-                self.logger.error_message('could not determine temperatures, assuming all fine')
+            if (response.get('temperature') is None):
+                self.logger.error_message(
+                    '{__name} could not determine temperatures, assuming all fine')
                 return True
-            if(response.get('temperature')['bed']['actual'] > self.bed_temp_max):
-                self.logger.error_message('BED IS OVERHEATING!')
+            if (response.get('temperature')['bed']['actual'] > self.bed_temp_max):
+                self.logger.error_message('{__name__} BED IS OVERHEATING!')
                 return False
-            if(response.get('temperature')['tool0']['actual'] > self.tool_temp_max):
-                self.logger.error_message('TOOL IS OVERHEATING!')
+            if (response.get('temperature')['tool0']['actual'] > self.tool_temp_max):
+                self.logger.error_message('{__name__} TOOL IS OVERHEATING!')
                 return False
             return True
 
     def get_status(self) -> Job | None:
         response = None
-        self.logger.info_message('requesting job state')
+        self.logger.info_message('{__name__} requesting job state')
         try:
             response = requests.get(
                 self.job_url, headers=self.token, timeout=5)
         except Exception as error:
             self.logger.error_message(
-                    f'{HOST_UNREACHABLE}: failed requesting {self.job_url}')
+                f'{HOST_UNREACHABLE}: failed requesting {self.job_url}')
         if response is None:
             return None
-        self.logger.info_message('request succeeded')
+        self.logger.info_message('{__name__} request succeeded')
         if response.status_code != 200:
             self.logger.error_message(
                 'failed to request job state with status code {code}\n{message}'.format(code=response.status_code, message=response))
             return None
         response = response.json()
         if response.get('error') is not None:
-            self.logger.error_message('failed to get status with error \"{error}\"'.format(
+            self.logger.error_message('{__name__} failed to get status with error \"{error}\"'.format(
                 error=response.get('error')))
             return None
-        
-        estimated_print_time=response.get('job')['estimatedPrintTime']
-        file=response.get('job')['file']['name'].replace('.gcode', '') if response.get('job')['file']['name'] else None
-        completion=response.get('progress')['completion']
-        print_time_left=response.get('progress')['printTimeLeft']
-        print_time=response.get('progress')['printTime']
-        state=response.get('state')
+
+        estimated_print_time = response.get('job')['estimatedPrintTime']
+        file = response.get('job')['file']['name'].replace(
+            '.gcode', '') if response.get('job')['file']['name'] else None
+        completion = response.get('progress')['completion']
+        print_time_left = response.get('progress')['printTimeLeft']
+        print_time = response.get('progress')['printTime']
+        state = response.get('state')
         filament = 0
-        if(not not response.get('job')['filament']):
-            filament=response.get('job')['filament']['tool0']['length'] if 'tool0' in response.get('job')['filament'] else 0
+        if (not not response.get('job')['filament']):
+            filament = response.get('job')[
+                'filament']['tool0']['length'] if 'tool0' in response.get('job')['filament'] else 0
 
         self.logger.info_message(
             f'estimated print time: {estimated_print_time} | file: {file} | completion: {completion} | print time left: {print_time_left} | print time: {print_time} | state: {state} | filament: {filament}'
@@ -116,14 +122,14 @@ class OctoPi():
 
     def get_image(self) -> None:
         response = None
-        self.logger.info_message('requesting image')
+        self.logger.info_message('{__name__} requesting image')
         try:
             response = requests.get(self.image_url, stream=True)
         except:
             self.logger.error_message(
                 'failed to request job state, host probably unreachable')
             return None
-        self.logger.info_message('request succeeded')
+        self.logger.info_message('{__name__} request succeeded')
         if response.status_code != 200:
             self.logger.error_message(
                 'failed to request job state with status code {code}'.format(code=response.status_code))

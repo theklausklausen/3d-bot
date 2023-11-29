@@ -10,13 +10,13 @@ from telegram_client import Telegram
 
 def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     logger = Logger()
-    if(job.has_finished()):
+    if (job.has_finished()):
         payload = {
             'absolute': True,
             'y': -150,
             'command': 'jog'
         }
-        logger.info_message('request to move bed to center')
+        logger.info_message('{__name__} request to move bed to center')
         try:
             response = requests.post(
                 '{host}/api/printer/printhead'.format(host=octopi.host), headers=octopi.token, json=payload, timeout=5)
@@ -26,14 +26,17 @@ def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> 
         time.sleep(15)
     MQTT().turnOnLight()
 
+
 def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     MQTT().turnOffLight()
+
 
 def on_overheating_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     MQTT().turnOffPrinter()
     time.sleep(5)
     MQTT().turnOffOctoPi()
-    
+
+
 def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
     logger = Logger()
     payload = {
@@ -41,7 +44,7 @@ def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -
         'y': 150,
         'command': 'jog'
     }
-    logger.info_message('request to move bed to front')
+    logger.info_message('{__name__} request to move bed to front')
     try:
         response = requests.post(
             '{host}/api/printer/printhead'.format(host=octopi.host), headers=octopi.token, json=payload, timeout=5)
@@ -50,7 +53,7 @@ def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -
             'failed to request moving\n{error}'.format(error=error))
     time.sleep(15)
 
-    logger.info_message('request shutdown')
+    logger.info_message('{__name__} request shutdown')
     try:
         requests.post(
             '{host}/api/system/commands/core/shutdown'.format(host=octopi.host), headers=octopi.token, timeout=5)
@@ -60,6 +63,7 @@ def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -
     MQTT().turnOffPrinter()
     time.sleep(120)
     MQTT().turnOffOctoPi()
+
 
 class MQTT:
 
@@ -89,13 +93,15 @@ class MQTT:
             cls._instance.verify_ssl_certificate = os.environ.get(
                 'MQTT_SSL_VERIFICATION', False)
             cls._instance.logger = Logger(debug=debug)
-            cls._instance.logger.debug_message('created new mqtt object')
+            cls._instance.logger.debug_message(
+                '{__name} created new mqtt object')
             cls._instance.client = cls._instance.initClient()
             cls._instance.connectClient()
             cls._instance.client.on_connect = cls._instance.on_connect
             cls._instance.printer_topic = os.environ.get(
                 'MQTT_PRINTER_TOPIC', '/command/topic')
-            cls._instance.printer_off = os.environ.get('MQTT_PRINTER_OFF', 'off')
+            cls._instance.printer_off = os.environ.get(
+                'MQTT_PRINTER_OFF', 'off')
             cls._instance.octopi_topic = os.environ.get(
                 'MQTT_OCTOPI_TOPIC', '/command/topic')
             cls._instance.octopi_off = os.environ.get('MQTT_OCTOPI_OFF', 'off')
@@ -103,7 +109,7 @@ class MQTT:
         return cls._instance
 
     def __del__(self):
-        self.logger.info_message('deleting mqtt instance')
+        self.logger.info_message('{__name__} deleting mqtt instance')
 
     def initClient(self):
         self.logger.info_message(
@@ -119,27 +125,28 @@ class MQTT:
         return client
 
     def connectClient(self):
-        self.logger.info_message('trying to connect to {host}:{port} ...'.format(
+        self.logger.info_message('{__name__} trying to connect to {host}:{port} ...'.format(
             host=self.host, port=self.port))
-        self.logger.debug_message('using user {user}, id {id}, password {password}'.format(
+        self.logger.debug_message('{__name__} using user {user}, id {id}, password {password}'.format(
             user=self.user,
             id=self.id,
             password=self.password
         ))
         try:
             result = self.client.connect(self.host, self.port)
-            if(result != 0):
-                self.logger.error_message('failed to connect to MQTT server')
+            if (result != 0):
+                self.logger.error_message(
+                    '{__name} failed to connect to MQTT server')
         except Exception as error:
-            self.logger.error_message('failed mqtt connection to {host}:{port} with result {result}'.format(
+            self.logger.error_message('{__name__} failed mqtt connection to {host}:{port} with result {result}'.format(
                 host=self.host, port=self.port, result=error))
             return False
         return True
 
     def on_connect(self, userdata, flags, rc, result):
-        self.logger.info_message('successfull mqtt connection to {host}:{port}'.format(
+        self.logger.info_message('{__name__} successfull mqtt connection to {host}:{port}'.format(
             host=self.host, port=self.port))
-        self.logger.debug_message('userdata: {userdata}\nflags: {flags}\nrc: {rc}\nresult: {result}'.format(
+        self.logger.debug_message('{__name__} userdata: {userdata}\nflags: {flags}\nrc: {rc}\nresult: {result}'.format(
             userdata=userdata,
             flags=flags,
             rc=rc,
@@ -167,6 +174,6 @@ class MQTT:
         time.sleep(5)
 
     def publishMessage(self, topic: str, payload: str):
-        self.logger.info_message('sending mqtt payload {payload} on {topic}'.format(
+        self.logger.info_message('{__name__} sending mqtt payload {payload} on {topic}'.format(
             payload=payload, topic=topic))
         self.client.publish(topic=topic, payload=payload)

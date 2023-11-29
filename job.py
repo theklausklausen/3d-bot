@@ -35,9 +35,11 @@ class Job():
             cls.filament = filament
             cls.state = state
             cls.lastState = None
-            cls._instance.logger.debug_message('created new job object')
+            cls._instance.logger.debug_message(
+                '{__name} created new job object')
         else:
-            cls._instance.logger.debug_message('return existing job object')
+            cls._instance.logger.debug_message(
+                '{__name} return existing job object')
             cls._instance.estimated_print_time = estimated_print_time
             cls._instance.file = file
             cls._instance.progress = {
@@ -50,14 +52,14 @@ class Job():
         return cls._instance
 
     def __del__(self):
-        self.logger.info_message('deleting job instance')
+        self.logger.info_message('{__name__} deleting job instance')
 
     def has_quarter_achieved(self) -> bool:
         for key, value in enumerate(self.states):
-            if(not self.progress['completion']):
+            if (not self.progress['completion']):
                 return False
             if int(self.progress['completion']) >= int(value) and self.states[value] is None:
-                self.logger.debug_message('set state {state} to {value}'.format(
+                self.logger.debug_message('{__name__} set state {state} to {value}'.format(
                     state=value, value=self.progress['completion']))
                 self.states[value] = float(self.progress['completion'])
                 return True

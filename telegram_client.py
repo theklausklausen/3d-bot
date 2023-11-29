@@ -22,7 +22,7 @@ class Telegram:
                 'message sending failed more than 5 times')
             return
         try:
-            self.logger.info_message('sending message')
+            self.logger.info_message('{__name__} sending message')
             self.logger.debug_message(
                 'message: {message}'.format(message=message))
             await self.bot.sendMessage(
@@ -30,17 +30,19 @@ class Telegram:
                 text=message
             )
         except Exception as e:
-            self.logger.error_message('message sending failed')
-            self.logger.error_message('error: {error}'.format(error=e))
+            self.logger.error_message('{__name__} message sending failed')
+            self.logger.error_message(
+                '{__name} error: {error}'.format(error=e))
             self.message_sent_failed_ctr += 1
         self.message_sent_failed_ctr = 0
 
     async def send_image(self, message: str, image: bytes):
         if self.image_sent_failed_ctr > 5:
-            self.logger.error_message('image sending failed more than 5 times')
+            self.logger.error_message(
+                '{__name} image sending failed more than 5 times')
             return
         try:
-            self.logger.info_message('sending message')
+            self.logger.info_message('{__name__} sending message')
             self.logger.debug_message(
                 'message: {message}'.format(message=message))
             await self.bot.send_photo(
@@ -49,7 +51,8 @@ class Telegram:
                 caption=message
             )
         except Exception as e:
-            self.logger.error_message('image sending failed')
-            self.logger.error_message('error: {error}'.format(error=e))
+            self.logger.error_message('{__name__} image sending failed')
+            self.logger.error_message(
+                '{__name} error: {error}'.format(error=e))
             self.image_sent_failed_ctr += 1
         self.image_sent_failed_ctr = 0

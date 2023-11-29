@@ -12,13 +12,14 @@ class Logger:
             cls._instance = super(Logger, cls).__new__(cls)
             super().__init__(cls)
             logging.basicConfig(
-                format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+                format="%(asctime)s - %(levelname)s - %(message)s", level=logging.DEBUG
             )
             cls._instance.debug = debug
             cls._instance.log = logging.getLogger(__name__)
-            cls._instance.debug_message('created new logger object')
+            cls._instance.debug_message('{__name__} created new logger object')
         else:
-            cls._instance.debug_message('return existing logger object')
+            cls._instance.debug_message(
+                '{__name} return existing logger object')
         return cls._instance
 
     def debug_message(self, message):
