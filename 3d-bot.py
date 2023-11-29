@@ -15,28 +15,28 @@ from errors import *
 from sentry import init_sentry
 
 telegram = octopi = job = None
-debug = os.environ.get('DEBUG', default='False') == 'True'
+debug = os.environ.get(f'DEBUG', default='False') == 'True'
 logger = Logger(debug=debug)
 module = import_path = script_path = None
 
 init_sentry(debug=debug)
 
 try:
-    script_path = os.environ.get('CUSTOM_SCRIPT_PATH')
+    script_path = os.environ.get(f'CUSTOM_SCRIPT_PATH')
 except EnvironmentError:
     pass
 
 if script_path:
     if os.path.isfile(script_path):
         try:
-            module = script_path.split('/')[-1].replace('.py', '')
+            module = script_path.split(f'/')[-1].replace(f'.py', '')
             import_path = script_path.replace(
-                '/{module}.py'.format(module=module), '')
+                f'/{module}.py', '')
         except Exception:
             logger.error_message(
-                'CUSTOM_SCRIPT_PATH has to be like "/path/to/file.py"')
+                f'CUSTOM_SCRIPT_PATH has to be like "/path/to/file.py"')
     else:
-        raise ImportError('{script} not found'.format(script=script_path))
+        raise ImportError(f'{script_path} not found')
 
 if module:
     sys.path.insert(1, import_path)
@@ -51,7 +51,7 @@ if module:
             message='no \"pre_message_command\" function found, using default definition')
 
         def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** pre message command ***')
+            print(f'*** pre message command ***')
 
     # post message command
     try:
@@ -64,7 +64,7 @@ if module:
             message='no \"post_message_command\" function found, using default definition')
 
         def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** post message command ***')
+            print(f'*** post message command ***')
 
     # post finished command
     try:
@@ -77,7 +77,7 @@ if module:
             message='no \"post_finished_command\" function found, using default definition')
 
         def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** post finished command ***')
+            print(f'*** post finished command ***')
 
     # post filament empty command
     try:
@@ -90,7 +90,7 @@ if module:
             message='no \"on_filament_empty_command\" function found, using default definition')
 
         def on_filament_empty_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** post on filament empty command ***')
+            print(f'*** post on filament empty command ***')
 
     # on overheating command
     try:
@@ -103,20 +103,20 @@ if module:
             message='no \"on_overheating_command\" function found, using default definition')
 
         def on_overheating_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-            print('*** on overheating command command ***')
+            print(f'*** on overheating command command ***')
 
 else:
     def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-        print('*** pre message command ***')
+        print(f'*** pre message command ***')
 
     def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-        print('*** post message command ***')
+        print(f'*** post message command ***')
 
     def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-        print('*** post finished command ***')
+        print(f'*** post finished command ***')
 
     def on_filament_empty_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-        print('*** post on filament empty command ***')
+        print(f'*** post on filament empty command ***')
 
 
 class Runtime():
@@ -124,10 +124,10 @@ class Runtime():
     octopi = OctoPi(debug=debug)
     job = None
     if not debug:
-        logging.getLogger('asyncio').setLevel(logging.INFO)
+        logging.getLogger(f'asyncio').setLevel(logging.INFO)
 
     async def send_state(self, prefix: str = ''):
-        logger.info_message('{__name__} sending state')
+        logger.info_message(f'{__name__} sending state')
         message = '{prefix}The job of {file} has reached {completion:.2f}% of completion.\nFilament usage: ~ {current:.2f}m / {planned:.2f}m\nETA: {eta} hrs\n{link}'.format(
             prefix=prefix,
             file=self.job.file,
@@ -145,8 +145,8 @@ class Runtime():
     async def main(self) -> None:
         load_dotenv()
 
-        logger.info_message('{__name__} starting up...')
-        sleep_time = int(os.environ.get('SLEEP_TIME', '5'))
+        logger.info_message(f'{__name__} starting up...')
+        sleep_time = int(os.environ.get(f'SLEEP_TIME', '5'))
 
         while True:
             time.sleep(sleep_time)

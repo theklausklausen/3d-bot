@@ -16,13 +16,13 @@ def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> 
             'y': -150,
             'command': 'jog'
         }
-        logger.info_message('{__name__} request to move bed to center')
+        logger.info_message(f'{__name__} request to move bed to center')
         try:
             response = requests.post(
-                '{host}/api/printer/printhead'.format(host=octopi.host), headers=octopi.token, json=payload, timeout=5)
+                f'{octopi.host}/api/printer/printhead', headers=octopi.token, json=payload, timeout=5)
         except Exception as error:
             logger.error_message(
-                'failed to request moving\n{error}'.format(error=error))
+                f'failed to request moving\n{error}')
         time.sleep(15)
     MQTT().turnOnLight()
 
@@ -44,22 +44,22 @@ def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -
         'y': 150,
         'command': 'jog'
     }
-    logger.info_message('{__name__} request to move bed to front')
+    logger.info_message(f'{__name__} request to move bed to front')
     try:
         response = requests.post(
-            '{host}/api/printer/printhead'.format(host=octopi.host), headers=octopi.token, json=payload, timeout=5)
+            '{octopi.host}/api/printer/printhead', headers=octopi.token, json=payload, timeout=5)
     except Exception as error:
         logger.error_message(
-            'failed to request moving\n{error}'.format(error=error))
+            'failed to request moving\n{error}')
     time.sleep(15)
 
-    logger.info_message('{__name__} request shutdown')
+    logger.info_message(f'{__name__} request shutdown')
     try:
         requests.post(
-            '{host}/api/system/commands/core/shutdown'.format(host=octopi.host), headers=octopi.token, timeout=5)
+            '{octopi.host}/api/system/commands/core/shutdown', headers=octopi.token, timeout=5)
     except Exception as error:
         logger.error_message(
-            'failed to request shutting off\n{error}'.format(error=error))
+            'failed to request shutting off\n{error}')
     MQTT().turnOffPrinter()
     time.sleep(120)
     MQTT().turnOffOctoPi()
@@ -77,43 +77,44 @@ class MQTT:
             cls._instance = super(MQTT, cls).__new__(cls)
             super().__init__(cls)
             cls._instance.host = os.environ.get(
-                'MQTT_HOST', 'test.mosquitto.org')
+                f'MQTT_HOST', 'test.mosquitto.org')
             try:
-                cls._instance.port = int(os.environ.get('MQTT_PORT', '1883'))
+                cls._instance.port = int(os.environ.get(f'MQTT_PORT', '1883'))
             except:
-                raise EnvironmentError('MQTT_PORT must be a digit')
-            cls._instance.user = os.environ.get('MQTT_USER', 'user')
+                raise EnvironmentError(f'MQTT_PORT must be a digit')
+            cls._instance.user = os.environ.get(f'MQTT_USER', 'user')
             cls._instance.password = os.environ.get(
-                'MQTT_PASSWORD', 'password')
-            cls._instance.id = os.environ.get('MQTT_ID', '3d-bot')
+                f'MQTT_PASSWORD', 'password')
+            cls._instance.id = os.environ.get(f'MQTT_ID', '3d-bot')
             cls._instance.lamp_topic = os.environ.get(
-                'MQTT_LAMP_TOPIC', '/command/topic')
-            cls._instance.lamp_on = os.environ.get('MQTT_LAMP_ON', 'on')
-            cls._instance.lamp_off = os.environ.get('MQTT_LAMP_OFF', 'off')
+                f'MQTT_LAMP_TOPIC', '/command/topic')
+            cls._instance.lamp_on = os.environ.get(f'MQTT_LAMP_ON', 'on')
+            cls._instance.lamp_off = os.environ.get(f'MQTT_LAMP_OFF', 'off')
             cls._instance.verify_ssl_certificate = os.environ.get(
-                'MQTT_SSL_VERIFICATION', False)
+                f'MQTT_SSL_VERIFICATION', False)
             cls._instance.logger = Logger(debug=debug)
             cls._instance.logger.debug_message(
-                '{__name} created new mqtt object')
+                f'{__name__} created new mqtt object')
             cls._instance.client = cls._instance.initClient()
             cls._instance.connectClient()
             cls._instance.client.on_connect = cls._instance.on_connect
             cls._instance.printer_topic = os.environ.get(
-                'MQTT_PRINTER_TOPIC', '/command/topic')
+                f'MQTT_PRINTER_TOPIC', '/command/topic')
             cls._instance.printer_off = os.environ.get(
-                'MQTT_PRINTER_OFF', 'off')
+                f'MQTT_PRINTER_OFF', 'off')
             cls._instance.octopi_topic = os.environ.get(
-                'MQTT_OCTOPI_TOPIC', '/command/topic')
-            cls._instance.octopi_off = os.environ.get('MQTT_OCTOPI_OFF', 'off')
+                f'MQTT_OCTOPI_TOPIC', '/command/topic')
+            cls._instance.octopi_off = os.environ.get(
+                f'MQTT_OCTOPI_OFF', 'off')
 
         return cls._instance
 
     def __del__(self):
-        self.logger.info_message('{__name__} deleting mqtt instance')
+        self.logger.info_message(f'{__name__} deleting mqtt instance')
 
     def initClient(self):
         self.logger.info_message(
-            'creating mqtt-client for {user} - {id}'.format(user=self.user, id=self.id))
+            'creating mqtt-client for {self.user} - {self.id}')
         client = mqtt.Client(
             client_id=self.id,
             clean_session=False
@@ -125,33 +126,26 @@ class MQTT:
         return client
 
     def connectClient(self):
-        self.logger.info_message('{__name__} trying to connect to {host}:{port} ...'.format(
-            host=self.host, port=self.port))
-        self.logger.debug_message('{__name__} using user {user}, id {id}, password {password}'.format(
-            user=self.user,
-            id=self.id,
-            password=self.password
-        ))
+        self.logger.info_message(
+            f'{__name__} trying to connect to {self.host}:{self.port} ...')
+        self.logger.debug_message(
+            f'{__name__} using user {self.user}, id {self.id}, password {self.password}')
         try:
             result = self.client.connect(self.host, self.port)
             if (result != 0):
                 self.logger.error_message(
-                    '{__name} failed to connect to MQTT server')
+                    '{__name__} failed to connect to MQTT server')
         except Exception as error:
-            self.logger.error_message('{__name__} failed mqtt connection to {host}:{port} with result {result}'.format(
-                host=self.host, port=self.port, result=error))
+            self.logger.error_message(
+                f'{__name__} failed mqtt connection to {self.host}:{self.port} with result {result}')
             return False
         return True
 
     def on_connect(self, userdata, flags, rc, result):
-        self.logger.info_message('{__name__} successfull mqtt connection to {host}:{port}'.format(
-            host=self.host, port=self.port))
-        self.logger.debug_message('{__name__} userdata: {userdata}\nflags: {flags}\nrc: {rc}\nresult: {result}'.format(
-            userdata=userdata,
-            flags=flags,
-            rc=rc,
-            result=result
-        ))
+        self.logger.info_message(
+            f'{__name__} successfull mqtt connection to {self.host}:{self.port}')
+        self.logger.debug_message(
+            f'{__name__} userdata: {userdata}\nflags: {flags}\nrc: {rc}\nresult: {result}')
 
     def turnOnLight(self):
         self.connectClient()
@@ -174,6 +168,6 @@ class MQTT:
         time.sleep(5)
 
     def publishMessage(self, topic: str, payload: str):
-        self.logger.info_message('{__name__} sending mqtt payload {payload} on {topic}'.format(
-            payload=payload, topic=topic))
+        self.logger.info_message(
+            f'{__name__} sending mqtt payload {payload} on {topic}')
         self.client.publish(topic=topic, payload=payload)

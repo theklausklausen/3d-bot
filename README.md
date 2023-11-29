@@ -47,19 +47,19 @@ from telegram_client import Telegram
 
 # executed before state message is send
 def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-    print('pre message command')
+    print(f'pre message command')
 
 # executed after state message is send
 def post_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-    print('post message command')
+    print(f'post message command')
 
 # executed after print has finished
 def postFinishCommand(self, telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-    print('post finish command')
+    print(f'post finish command')
 
 # executed when printer run out of filament
 def on_filament_empty_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> None:
-    print('on filament empty command')
+    print(f'on filament empty command')
 ```
 
 You can then call this script by adding the following line to your .env file:
