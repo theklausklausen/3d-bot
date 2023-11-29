@@ -114,7 +114,7 @@ class MQTT:
 
     def initClient(self):
         self.logger.info_message(
-            'creating mqtt-client for {self.user} - {self.id}')
+            f'creating mqtt-client for {self.user} - {self.id}')
         client = mqtt.Client(
             client_id=self.id,
             clean_session=False

@@ -34,6 +34,7 @@ class Telegram:
             self.logger.error_message(
                 f'{__name__} error: {error}')
             self.message_sent_failed_ctr += 1
+            self.send_message(message=message)
         self.message_sent_failed_ctr = 0
 
     async def send_image(self, message: str, image: bytes):
@@ -55,4 +56,5 @@ class Telegram:
             self.logger.error_message(
                 f'{__name__} error: {error}')
             self.image_sent_failed_ctr += 1
+            self.send_image(message=message, image=image)
         self.image_sent_failed_ctr = 0
