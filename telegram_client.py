@@ -22,7 +22,7 @@ class Telegram:
                 f'message sending failed more than 5 times')
             return
         try:
-            self.logger.info_message(f'{__name__} sending message')
+            self.logger.info_message(f'{__name__} - sending message')
             self.logger.debug_message(
                 f'message: {message}')
             await self.bot.sendMessage(
@@ -30,9 +30,9 @@ class Telegram:
                 text=message
             )
         except Exception as error:
-            self.logger.error_message(f'{__name__} message sending failed')
+            self.logger.error_message(f'{__name__} - message sending failed')
             self.logger.error_message(
-                f'{__name__} error: {error}')
+                f'{__name__} - error: {error}')
             self.message_sent_failed_ctr += 1
             self.send_message(message=message)
         self.message_sent_failed_ctr = 0
@@ -40,10 +40,10 @@ class Telegram:
     async def send_image(self, message: str, image: bytes):
         if self.image_sent_failed_ctr > 5:
             self.logger.error_message(
-                f'{__name__} image sending failed more than 5 times')
+                f'{__name__} - image sending failed more than 5 times')
             return
         try:
-            self.logger.info_message(f'{__name__} sending message')
+            self.logger.info_message(f'{__name__} - sending message')
             self.logger.debug_message(
                 f'message: {message}')
             await self.bot.send_photo(
@@ -52,9 +52,9 @@ class Telegram:
                 caption=message
             )
         except Exception as error:
-            self.logger.error_message(f'{__name__} image sending failed')
+            self.logger.error_message(f'{__name__} - image sending failed')
             self.logger.error_message(
-                f'{__name__} error: {error}')
+                f'{__name__} - error: {error}')
             self.image_sent_failed_ctr += 1
             self.send_image(message=message, image=image)
         self.image_sent_failed_ctr = 0

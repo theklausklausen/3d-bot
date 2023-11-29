@@ -17,10 +17,10 @@ class Logger:
             cls._instance.debug = debug
             cls._instance.log = logging.getLogger(__name__)
             cls._instance.debug_message(
-                f'{__name__} created new logger object')
+                f'{__name__} - created new logger object')
         else:
             cls._instance.debug_message(
-                f'{__name__} return existing logger object')
+                f'{__name__} - return existing logger object')
         return cls._instance
 
     def debug_message(self, message):

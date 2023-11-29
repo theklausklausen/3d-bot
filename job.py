@@ -36,10 +36,10 @@ class Job():
             cls.state = state
             cls.lastState = None
             cls._instance.logger.debug_message(
-                f'{__name__} created new job object')
+                f'{__name__} - created new job object')
         else:
             cls._instance.logger.debug_message(
-                f'{__name__} return existing job object')
+                f'{__name__} - return existing job object')
             cls._instance.estimated_print_time = estimated_print_time
             cls._instance.file = file
             cls._instance.progress = {
@@ -52,7 +52,7 @@ class Job():
         return cls._instance
 
     def __del__(self):
-        self.logger.info_message(f'{__name__} deleting job instance')
+        self.logger.info_message(f'{__name__} - deleting job instance')
 
     def has_quarter_achieved(self) -> bool:
         for key, value in enumerate(self.states):
@@ -60,7 +60,7 @@ class Job():
                 return False
             if int(self.progress['completion']) >= int(value) and self.states[value] is None:
                 self.logger.debug_message(
-                    f'{__name__} set state {value} to {self.progress["completion"]}')
+                    f'{__name__} - set state {value} to {self.progress["completion"]}')
                 self.states[value] = float(self.progress['completion'])
                 return True
         return False

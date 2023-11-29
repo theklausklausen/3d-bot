@@ -16,7 +16,7 @@ def pre_message_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -> 
             'y': -150,
             'command': 'jog'
         }
-        logger.info_message(f'{__name__} request to move bed to center')
+        logger.info_message(f'{__name__} - request to move bed to center')
         try:
             response = requests.post(
                 f'{octopi.host}/api/printer/printhead', headers=octopi.token, json=payload, timeout=5)
@@ -44,7 +44,7 @@ def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -
         'y': 150,
         'command': 'jog'
     }
-    logger.info_message(f'{__name__} request to move bed to front')
+    logger.info_message(f'{__name__} - request to move bed to front')
     try:
         response = requests.post(
             '{octopi.host}/api/printer/printhead', headers=octopi.token, json=payload, timeout=5)
@@ -53,7 +53,7 @@ def post_finished_command(telegram_client: Telegram, job: Job, octopi: OctoPi) -
             'failed to request moving\n{error}')
     time.sleep(15)
 
-    logger.info_message(f'{__name__} request shutdown')
+    logger.info_message(f'{__name__} - request shutdown')
     try:
         requests.post(
             '{octopi.host}/api/system/commands/core/shutdown', headers=octopi.token, timeout=5)
@@ -94,7 +94,7 @@ class MQTT:
                 f'MQTT_SSL_VERIFICATION', False)
             cls._instance.logger = Logger(debug=debug)
             cls._instance.logger.debug_message(
-                f'{__name__} created new mqtt object')
+                f'{__name__} - created new mqtt object')
             cls._instance.client = cls._instance.initClient()
             cls._instance.connectClient()
             cls._instance.client.on_connect = cls._instance.on_connect
@@ -110,7 +110,7 @@ class MQTT:
         return cls._instance
 
     def __del__(self):
-        self.logger.info_message(f'{__name__} deleting mqtt instance')
+        self.logger.info_message(f'{__name__} - deleting mqtt instance')
 
     def initClient(self):
         self.logger.info_message(
@@ -127,25 +127,25 @@ class MQTT:
 
     def connectClient(self):
         self.logger.info_message(
-            f'{__name__} trying to connect to {self.host}:{self.port} ...')
+            f'{__name__} - trying to connect to {self.host}:{self.port} ...')
         self.logger.debug_message(
-            f'{__name__} using user {self.user}, id {self.id}, password {self.password}')
+            f'{__name__} - using user {self.user}, id {self.id}, password {self.password}')
         try:
             result = self.client.connect(self.host, self.port)
             if (result != 0):
                 self.logger.error_message(
-                    f'{__name__} failed to connect to MQTT server')
+                    f'{__name__} - failed to connect to MQTT server')
         except Exception as error:
             self.logger.error_message(
-                f'{__name__} failed mqtt connection to {self.host}:{self.port} with result {result}')
+                f'{__name__} - failed mqtt connection to {self.host}:{self.port} with result {result}')
             return False
         return True
 
     def on_connect(self, userdata, flags, rc, result):
         self.logger.info_message(
-            f'{__name__} successfull mqtt connection to {self.host}:{self.port}')
+            f'{__name__} - successfull mqtt connection to {self.host}:{self.port}')
         self.logger.debug_message(
-            f'{__name__} userdata: {userdata}\nflags: {flags}\nrc: {rc}\nresult: {result}')
+            f'{__name__} - userdata: {userdata}\nflags: {flags}\nrc: {rc}\nresult: {result}')
 
     def turnOnLight(self):
         self.connectClient()
@@ -169,5 +169,5 @@ class MQTT:
 
     def publishMessage(self, topic: str, payload: str):
         self.logger.info_message(
-            f'{__name__} sending mqtt payload {payload} on {topic}')
+            f'{__name__} - sending mqtt payload {payload} on {topic}')
         self.client.publish(topic=topic, payload=payload)

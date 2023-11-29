@@ -127,7 +127,7 @@ class Runtime():
         logging.getLogger(f'asyncio').setLevel(logging.INFO)
 
     async def send_state(self, prefix: str = ''):
-        logger.info_message(f'{__name__} sending state')
+        logger.info_message(f'{__name__} - sending state')
         message = '{prefix}The job of {file} has reached {completion:.2f}% of completion.\nFilament usage: ~ {current:.2f}m / {planned:.2f}m\nETA: {eta} hrs\n{link}'.format(
             prefix=prefix,
             file=self.job.file,
@@ -145,7 +145,7 @@ class Runtime():
     async def main(self) -> None:
         load_dotenv()
 
-        logger.info_message(f'{__name__} starting up...')
+        logger.info_message(f'{__name__} - starting up...')
         sleep_time = int(os.environ.get(f'SLEEP_TIME', '5'))
 
         while True:
