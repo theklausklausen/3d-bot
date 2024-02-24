@@ -11,3 +11,4 @@ docker-compose
 Dockerfile
 LICENSE
 workspace.env*
+manifests/*
