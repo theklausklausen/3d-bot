@@ -20,9 +20,8 @@ ARG USER=bot
 WORKDIR /app
 COPY . /app/
 RUN addgroup -S -g 1000 $USER && \
-    adduser -u 1000 -SHG $USER $USER && \    
-    chown $USER:$USER /app && \
-    pip install --upgrade pip && \
-    pip install -r requirements.txt
+    adduser -u 1000 -SHG $USER $USER && \
+    pip3 install --upgrade pip && \
+    pip3 install -r requirements.txt
 USER $USER
 CMD ["python3", "3d-bot.py"]
