@@ -10,7 +10,7 @@ build_production:
   stage: build
   only:
   - main
-  image: repo.kk.int/runner-dind:latest
+  image: repo.kk.int/infra-images/runner:latest
   
   before_script:
     - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
