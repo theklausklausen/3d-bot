@@ -1,24 +1,26 @@
-ARG BASE_IMG=repo.kk.int/python-docker-image:latest
+ARG BASE_IMG=repo.kk.int/infra-images/python-base:latest
 FROM ${BASE_IMG} as dev
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ARG USER=bot
 WORKDIR /app
 COPY . /app/
-RUN useradd $USER && \
+RUN addgroup -S -g 1000 $USER && \
+    adduser -u 1000 -SHG $USER $USER && \
     pip3 install --upgrade pip && \
     pip3 install -r requirements.txt && \
     pip3 install debugpy
 USER $USER
 CMD ["python3", "-m", "debugpy", "--listen", "0.0.0.0:3001", "3d-bot.py"]
 
-FROM repo.kk.int/python-docker-image:latest as prod
+FROM repo.kk.int/infra-images/python-base:latest as prod
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ARG USER=bot
 WORKDIR /app
 COPY . /app/
-RUN useradd $USER && \
+RUN addgroup -S -g 1000 $USER && \
+    adduser -u 1000 -SHG $USER $USER && \    
     chown $USER:$USER /app && \
     pip install --upgrade pip && \
     pip install -r requirements.txt

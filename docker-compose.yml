@@ -6,7 +6,7 @@ services:
         dockerfile: ./Dockerfile
         target: dev
         args:
-          - BASE_IMG=${BASE_IMG:-repo.kk.int/python-docker-image:latest}
+          - BASE_IMG=${BASE_IMG:-repo.kk.int/infra-images/python-base:latest}
       volumes:
         - ./:/app
         - ./example-custom-script.py:/tmp/example-custom-script.py
