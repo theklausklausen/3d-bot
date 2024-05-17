@@ -82,8 +82,8 @@ spec:
           value: "OFF"
         resources:
           requests:
-            cpu: 250m
+            cpu: 50m
             memory: 100Mi
           limits:
-            cpu: 250m
+            cpu: 75m
             memory: 100Mi
