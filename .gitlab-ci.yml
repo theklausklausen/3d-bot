@@ -1,10 +1,32 @@
-variables:
-  DOCKER_DRIVER: overlay2
-  # DOCKER_TLS_CERTDIR: ""
+---
+include:
+  - project: "klausklausen/templates"
+    ref: main
+    file: "tests.yml"
+  - project: "klausklausen/templates"
+    ref: main
+    file: "deploy.yml"
 
 stages:
+  - test
   - build
   - deploy
+
+yamllint:
+  extends: .yaml_test
+
+prettier:
+  extends: .prettier_test
+
+unit tests:
+  extends: .python_test
+  variables:
+    TEST_DIR: bot/tests/
+
+test build:
+  extends: .build_test
+  variables:
+    BUILD_TARGET: prod
 
 build_production:
   stage: build
