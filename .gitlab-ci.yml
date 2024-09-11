@@ -47,17 +47,11 @@ build test image:
     IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
     BUILD_TARGET: dev
 build image:
-  extends: .image_multi_arch
+  extends: .build_amd64_only
   variables:
     IMAGE_NAME: ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
     IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
     BUILD_TARGET: prod
-package image:
-  extends: .image_tag
-  variables:
-    IMAGE_NAME: ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
-  tags:
-    - amd64
 
 # deploy helm:
 #   extends: .package_deploy_helm_chart
