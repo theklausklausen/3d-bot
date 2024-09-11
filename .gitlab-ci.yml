@@ -1,79 +1,63 @@
----
+# ---
 include:
-  - project: "klausklausen/templates"
+  - project: 'klausklausen/templates'
     ref: main
-    file: "tests.yml"
-  - project: "klausklausen/templates"
+    file: 'tests.yml'
+  - project: 'klausklausen/templates'
     ref: main
-    file: "deploy.yml"
+    file: 'deploy.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'build.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'package.yml'
+
+variables:
+  TAG: $CI_COMMIT_BRANCH
 
 stages:
   - test
   - build
+  - package
   - deploy
 
-yamllint:
-  extends: .yaml_test
+# lint helm:
+#   extends: .lint_helm_chart
+
+yaml lint:
+  extends: .lint_yaml
 
 prettier:
-  extends: .prettier_test
+  extends: .lint_prettier
 
-unit tests:
-  extends: .python_test
-  variables:
-    TEST_DIR: bot/tests/
+unit_tests:
+  stage: test
+  image: python:3.9
+  before_script:
+    - pip install pytest
+  script:
+    - pytest tests/
+  allow_failure: true
 
-test build:
+build test image:
   extends: .build_test
   variables:
+    IMAGE_NAME: ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
+    IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
+    BUILD_TARGET: test
+build image:
+  extends: .image_multi_arch
+  variables:
+    IMAGE_NAME: ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
+    IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
     BUILD_TARGET: prod
+package image:
+  extends: .image_tag
+  variables:
+    IMAGE_NAME: ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
+  tags:
+    - amd64
 
-build_production:
-  stage: build
-  only:
-  - main
-  image: repo.kk.int/infra-images/runner:latest
-  
-  before_script:
-    - docker login -u${NEXUS_CI_USER} -p${NEXUS_CI_PASSWORD} ${NEXUS_REPO_HOST}
-  after_script:
-    - docker buildx rm builder-${CI_PROJECT_NAME}
-    - docker logout ${NEXUS_REPO_HOST}
-  script:
-    - echo "building ${CI_PROJECT_NAME} for ${PROJECT_PLATTFORMS}"
-    - docker buildx create 
-      --name builder-${CI_PROJECT_NAME}
-      --driver docker-container
-      --config /etc/buildkit.toml 
-      --use
-    - docker buildx inspect --bootstrap
-    - docker buildx build 
-      --platform linux/amd64,linux/arm64
-      --target prod
-      --no-cache
-      --push
-      -f ${CI_PROJECT_DIR}/Dockerfile 
-      --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}
-      --tag ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}:latest . 
-
-deploy:
-  stage: deploy
-  only:
-    - main
-  image: alpine
-  before_script:
-    - apk add openssh
-    - 'command -v ssh-agent >/dev/null || ( apk add --update openssh )' 
-    - eval $(ssh-agent -s)
-    - echo "${SSH_PRIVATE_KEY}" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan ${SWARM_MANAGER} >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-  script:
-    - ssh
-      ${SWARM_MANAGER_USER}@${SWARM_MANAGER} 
-      "cd /mnt/clusterfs &&
-      docker service rm botfarm_${CI_PROJECT_NAME} && 
-      docker stack deploy -c botfarm.yml botfarm"
-
+# deploy helm:
+#   extends: .package_deploy_helm_chart
