@@ -12,6 +12,12 @@ include:
   - project: 'klausklausen/templates'
     ref: main
     file: 'package.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'security.yml'
+  - project: 'klausklausen/templates'
+    ref: main
+    file: 'lint.yml'
 
 variables:
   TAG: $CI_COMMIT_BRANCH
