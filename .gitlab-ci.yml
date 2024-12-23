@@ -23,8 +23,9 @@ variables:
   TAG: $CI_COMMIT_BRANCH
 
 stages:
-  - test
   - security
+  - lint
+  - test
   - build
   - package
   - deploy
@@ -36,8 +37,6 @@ package_scan:
   extends: .package_scan
 
 # lint
-ansible lint:
-  extends: .ansible_lint
 markdown lint:
   extends: .markdown_lint
 yaml lint:
