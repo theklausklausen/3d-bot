@@ -1,4 +1,4 @@
-# ---
+---
 include:
   - project: 'klausklausen/templates'
     ref: main
@@ -18,20 +18,29 @@ variables:
 
 stages:
   - test
+  - security
   - build
   - package
   - deploy
 
-# lint helm:
-#   extends: .lint_helm_chart
+# security
+secret_scan:
+  extends: .secret_scan
+package_scan:
+  extends: .package_scan
 
+# lint
+ansible lint:
+  extends: .ansible_lint
+markdown lint:
+  extends: .markdown_lint
 yaml lint:
-  extends: .lint_yaml
-
+  extends: .yaml_lint
 prettier:
-  extends: .lint_prettier
+  extends: .prettier
 
-unit_tests:
+``
+unit tests:
   stage: test
   image: python:3.9
   before_script:
@@ -39,19 +48,22 @@ unit_tests:
   script:
     - pytest tests/
   allow_failure: true
-
 build test image:
   extends: .build_test
   variables:
     IMAGE_NAME: ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
     IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
     BUILD_TARGET: dev
+
+# build
 build image:
   extends: .image_multi_arch
   variables:
     IMAGE_NAME: ${NEXUS_REPO_HOST}/${CI_PROJECT_NAME}
     IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
     BUILD_TARGET: prod
+
+# package
 package image:
   extends: .image_tag
   variables:
