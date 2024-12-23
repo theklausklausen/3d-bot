@@ -1,3 +1,4 @@
+---
 kind: Namespace
 apiVersion: v1
 metadata:
@@ -21,69 +22,69 @@ spec:
         app: 3d-bot
     spec:
       containers:
-      - name: 3d-bot
-        image: repo.kk.int/3d-bot:latest
-        imagePullPolicy: IfNotPresent
-        env:
-        - name: TZ
-          value: "Europe/Berlin"
-        - name: OCTOPI_KEY
-          valueFrom:
-            secretKeyRef:
-              name: 3d-bot-secret
-              key: octopi_key
-        - name: OCTOPI_URL
-          value: "http://octopi.kk.int"
-        - name: TELEGRAM_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: 3d-bot-secret
-              key: telegram_api_key
-        - name: TELEGRAM_CHAT_ID
-          valueFrom:
-            secretKeyRef:
-              name: 3d-bot-secret
-              key: telegram_chat_id
-        - name: OCTOPI_BED_TEMP_MAX
-          value: "70"
-        - name: OCTOPI_TOOL_TEMP_MAX
-          value: "225"
-        - name: MQTT_HOST
-          value: 192.168.51.233
-        - name: MQTT_PORT
-          value: "1883"
-        - name: MQTT_USER
-          valueFrom:
-            secretKeyRef:
-              name: 3d-bot-secret
-              key: mqtt_user
-        - name: MQTT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: 3d-bot-secret
-              key: mqtt_password
-        - name: MQTT_LAMP_TOPIC
-          value: "cmnd/berlin/sonoff_03/Power4"
-        - name: MQTT_LAMP_ON
-          value: "ON"
-        - name: MQTT_LAMP_OFF
-          value: "OFF"
-        - name: CUSTOM_SCRIPT_PATH
-          value: "/app/example-custom-script.py"
-        - name: DEBUG
-          value: "False"
-        - name: MQTT_PRINTER_TOPIC
-          value: "cmnd/berlin/sonoff_03/Power2"
-        - name: MQTT_PRINTER_OFF
-          value: "OFF"
-        - name: MQTT_OCTOPI_TOPIC
-          value: "cmnd/berlin/sonoff_03/Power3"
-        - name: MQTT_OCTOPI_OFF
-          value: "OFF"
-        resources:
-          requests:
-            cpu: 50m
-            memory: 100Mi
-          limits:
-            cpu: 75m
-            memory: 100Mi
+        - name: 3d-bot
+          image: repo.kk.int/3d-bot:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: OCTOPI_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: 3d-bot-secret
+                  key: octopi_key
+            - name: OCTOPI_URL
+              value: "http://octopi.kk.int"
+            - name: TELEGRAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: 3d-bot-secret
+                  key: telegram_api_key
+            - name: TELEGRAM_CHAT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: 3d-bot-secret
+                  key: telegram_chat_id
+            - name: OCTOPI_BED_TEMP_MAX
+              value: "70"
+            - name: OCTOPI_TOOL_TEMP_MAX
+              value: "225"
+            - name: MQTT_HOST
+              value: 192.168.51.233
+            - name: MQTT_PORT
+              value: "1883"
+            - name: MQTT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: 3d-bot-secret
+                  key: mqtt_user
+            - name: MQTT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: 3d-bot-secret
+                  key: mqtt_password
+            - name: MQTT_LAMP_TOPIC
+              value: "cmnd/berlin/sonoff_03/Power4"
+            - name: MQTT_LAMP_ON
+              value: "ON"
+            - name: MQTT_LAMP_OFF
+              value: "OFF"
+            - name: CUSTOM_SCRIPT_PATH
+              value: "/app/example-custom-script.py"
+            - name: DEBUG
+              value: "False"
+            - name: MQTT_PRINTER_TOPIC
+              value: "cmnd/berlin/sonoff_03/Power2"
+            - name: MQTT_PRINTER_OFF
+              value: "OFF"
+            - name: MQTT_OCTOPI_TOPIC
+              value: "cmnd/berlin/sonoff_03/Power3"
+            - name: MQTT_OCTOPI_OFF
+              value: "OFF"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              cpu: 75m
+              memory: 100Mi

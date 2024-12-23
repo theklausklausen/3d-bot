@@ -2,5 +2,7 @@
 __pycache__/
 secret.*
 secrets.*
-!secret.*.enc
-!secrets.*.enc
+!secret.enc.yaml
+!secrets.enc.yaml
+!secret.enc.yml
+!secrets.enc.yml

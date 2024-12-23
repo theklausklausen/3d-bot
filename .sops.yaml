@@ -1,4 +1,5 @@
+---
 creation_rules:
-- path_regex: (\/*\/)?secrets?\.ya?ml(.enc)?
-  age: >-
-    age1t9jj8nxxg5fuxwft4pcwh5xnmc3x84fy6cmrcq9u33pq7pc3u5kqnewfru
+  - path_regex: (\/*\/)?secrets?\.ya?ml(.enc)?
+    age: >-
+      age1t9jj8nxxg5fuxwft4pcwh5xnmc3x84fy6cmrcq9u33pq7pc3u5kqnewfru

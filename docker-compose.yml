@@ -1,23 +1,23 @@
-version: '3.5'
+---
 services:
   3d-bot:
-      build:
-        context: .
-        dockerfile: ./Dockerfile
-        target: dev
-        args:
-          - BASE_IMG=${BASE_IMG:-repo.kk.int/infra-images/python-base:latest}
-      volumes:
-        - ./:/app
-        - ./example-custom-script.py:/tmp/example-custom-script.py
-      env_file:
-        - ./workspace.env
-      ports:
-        - 3001:3001
-      restart: 'unless-stopped'
-      healthcheck:
-        test: ['CMD', 'python3', '--version']
-        interval: 30s
-        timeout: 5s
-        retries: 1
-        start_period: 10s
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: dev
+      args:
+        - BASE_IMG=${BASE_IMG:-repo.kk.int/infra-images/python-base:latest}
+    volumes:
+      - ./:/app
+      - ./example-custom-script.py:/tmp/example-custom-script.py
+    env_file:
+      - ./workspace.env
+    ports:
+      - 3001:3001
+    restart: 'unless-stopped'
+    healthcheck:
+      test: ['CMD', 'python3', '--version']
+      interval: 30s
+      timeout: 5s
+      retries: 1
+      start_period: 10s
