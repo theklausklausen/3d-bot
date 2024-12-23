@@ -39,7 +39,7 @@ yaml lint:
 prettier:
   extends: .prettier
 
-``
+# test
 unit tests:
   stage: test
   image: python:3.9
