@@ -47,7 +47,7 @@ prettier:
 # test
 unit tests:
   stage: test
-  image: python:3.9
+  image: python:3.13
   before_script:
     - pip install pytest
   script:
