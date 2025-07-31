@@ -9,3 +9,8 @@ up-build:
 
 dec_env:
 	sops -d workspace.env.encrypted > workspace.env
+
+# run unittests from docker container
+test:
+	docker exec 3d-bot_3d-bot_1 ls -lah /app/tests
+	docker exec 3d-bot_3d-bot_1 python -m unittest /app/

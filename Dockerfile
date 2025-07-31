@@ -22,6 +22,7 @@ COPY . /app/
 RUN addgroup -S -g 1000 $USER && \
     adduser -u 1000 -SHG $USER $USER
 RUN pip3 install --upgrade pip && \
-    pip3 install -r requirements.txt
+    pip3 install -r requirements.txt && \
+    pip3 install unittest
 USER $USER
 CMD ["python3", "3d-bot.py"]
